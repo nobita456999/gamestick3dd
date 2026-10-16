@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Người Que Đại Chiến 3D - Online & Offline 26 Vũ Khí</title>
+    <title>Người Que Đại Chiến 3D - Siêu Hiệu Ứng & Online P2P</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Three.js r128 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- PeerJS WebRTC Online Multiplayer (Cloudflare CDN) -->
+    <!-- PeerJS WebRTC Online Multiplayer -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -17,50 +17,52 @@
         * { user-select: none; -webkit-user-select: none; box-sizing: border-box; }
         body, html {
             margin: 0; padding: 0; width: 100%; height: 100%;
-            overflow: hidden; background-color: #060913;
+            overflow: hidden; background-color: #050811;
             font-family: 'Inter', sans-serif; color: #f8fafc;
         }
         .font-gaming { font-family: 'Chakra Petch', sans-serif; }
         canvas { display: block; width: 100%; height: 100%; outline: none; }
         .glass-panel {
-            background: rgba(15, 23, 42, 0.90);
+            background: rgba(15, 23, 42, 0.88);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.78);
         }
         .btn-game {
-            transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.16s cubic-bezier(0.34, 1.56, 0.64, 1);
             cursor: pointer;
         }
-        .btn-game:hover { transform: translateY(-2px) scale(1.02); }
-        .btn-game:active { transform: translateY(1px) scale(0.98); }
+        .btn-game:hover { transform: translateY(-2px) scale(1.02); filter: brightness(1.08); }
+        .btn-game:active { transform: translateY(1px) scale(0.97); }
         .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
         .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 8px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.45); border-radius: 8px; }
-        .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(251, 191, 36, 0.85); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.5); border-radius: 8px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(251, 191, 36, 0.9); }
         .key-badge {
             display: inline-flex; align-items: center; justify-content: center;
-            min-width: 2rem; height: 2rem; padding: 0 0.45rem;
-            border-radius: 0.45rem; background: #1e293b;
+            min-width: 2.1rem; height: 2.1rem; padding: 0 0.5rem;
+            border-radius: 0.5rem; background: #1e293b;
             border: 1px solid #475569; border-bottom-width: 3px;
-            font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 0.8rem; color: #f1f5f9;
-            cursor: pointer;
+            font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 0.82rem; color: #f1f5f9;
+            cursor: pointer; transition: all 0.08s ease;
         }
         .key-badge.active-key {
             transform: translateY(2px); border-bottom-width: 1px;
-            background: #3b82f6 !important; border-color: #60a5fa !important; color: #fff;
+            background: #f59e0b !important; border-color: #fde047 !important; color: #0f172a !important;
+            box-shadow: 0 0 14px rgba(245, 158, 11, 0.7);
         }
-        @keyframes floatUpFade {
-            0% { opacity: 1; transform: translate(-50%, 0) scale(0.85); }
-            25% { opacity: 1; transform: translate(-50%, -18px) scale(1.12); }
-            100% { opacity: 0; transform: translate(-50%, -46px) scale(0.95); }
+        @keyframes floatUpPop {
+            0% { opacity: 0; transform: translate(-50%, 6px) scale(0.6); }
+            20% { opacity: 1; transform: translate(-50%, -14px) scale(1.22); }
+            80% { opacity: 1; transform: translate(-50%, -38px) scale(1.0); }
+            100% { opacity: 0; transform: translate(-50%, -56px) scale(0.85); }
         }
         .damage-popup {
             position: absolute; pointer-events: none;
             font-family: 'Chakra Petch', sans-serif; font-weight: 800;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.95);
-            animation: floatUpFade 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            text-shadow: 0 3px 10px rgba(0,0,0,0.95), 0 0 8px rgba(0,0,0,0.8);
+            animation: floatUpPop 0.95s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             z-index: 30; white-space: nowrap;
         }
         .heal-channel-box {
@@ -74,51 +76,51 @@
     <!-- 3D Render Canvas -->
     <div id="canvas-container" class="absolute inset-0 w-full h-full z-0"></div>
 
-    <!-- Floating Damage & Heal UI Layer -->
+    <!-- Floating Damage, Status & Heal Progress Layer -->
     <div id="fx-layer" class="absolute inset-0 pointer-events-none z-20 overflow-hidden">
         <div id="p1-heal-ui" class="heal-channel-box hidden">
-            <div class="glass-panel px-2.5 py-1 rounded-xl border border-emerald-400/80 flex flex-col items-center gap-1">
-                <span class="text-[10px] font-gaming font-bold text-emerald-300 uppercase">Đang Hồi Máu (2s)...</span>
-                <div class="w-24 h-2 bg-slate-900 rounded-full overflow-hidden border border-emerald-500/40">
-                    <div id="p1-heal-progress" class="h-full bg-gradient-to-r from-emerald-500 to-lime-400" style="width:0%"></div>
+            <div class="glass-panel px-3 py-1.5 rounded-xl border border-emerald-400 flex flex-col items-center gap-1 shadow-lg">
+                <span class="text-[11px] font-gaming font-bold text-emerald-300 uppercase tracking-wider">⚡ Đang Hồi Máu (2s)...</span>
+                <div class="w-28 h-2.5 bg-slate-950 rounded-full overflow-hidden border border-emerald-500/50">
+                    <div id="p1-heal-progress" class="h-full bg-gradient-to-r from-emerald-500 via-lime-400 to-emerald-300" style="width:0%"></div>
                 </div>
             </div>
         </div>
         <div id="p2-heal-ui" class="heal-channel-box hidden">
-            <div class="glass-panel px-2.5 py-1 rounded-xl border border-emerald-400/80 flex flex-col items-center gap-1">
-                <span class="text-[10px] font-gaming font-bold text-emerald-300 uppercase">Đang Hồi Máu (2s)...</span>
-                <div class="w-24 h-2 bg-slate-900 rounded-full overflow-hidden border border-emerald-500/40">
-                    <div id="p2-heal-progress" class="h-full bg-gradient-to-r from-emerald-500 to-lime-400" style="width:0%"></div>
+            <div class="glass-panel px-3 py-1.5 rounded-xl border border-emerald-400 flex flex-col items-center gap-1 shadow-lg">
+                <span class="text-[11px] font-gaming font-bold text-emerald-300 uppercase tracking-wider">⚡ Đang Hồi Máu (2s)...</span>
+                <div class="w-28 h-2.5 bg-slate-950 rounded-full overflow-hidden border border-emerald-500/50">
+                    <div id="p2-heal-progress" class="h-full bg-gradient-to-r from-emerald-500 via-lime-400 to-emerald-300" style="width:0%"></div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- 1. OUTER LOBBY ("NGƯỜI QUE ĐẠI CHIẾN") -->
-    <div id="outer-lobby" class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-sm">
-        <div class="glass-panel rounded-3xl max-w-2xl w-full p-6 md:p-9 text-center border-2 border-amber-400/40 relative overflow-hidden">
-            <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 text-xs font-gaming font-bold uppercase tracking-widest mb-3">
-                ⚔️ ĐỐI KHÁNG 3D OFFLINE & ONLINE P2P 🌐
+    <div id="outer-lobby" class="absolute inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+        <div class="glass-panel rounded-3xl max-w-2xl w-full p-6 md:p-9 text-center border-2 border-amber-400/50 relative overflow-hidden">
+            <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-gaming font-bold uppercase tracking-widest mb-3">
+                ⚔️ SIÊU ĐỐI KHÁNG 3D • HIỆU ỨNG VẬT LÝ & ONLINE 60FPS 🌐
             </div>
-            <h1 class="font-gaming text-4xl sm:text-6xl font-extrabold tracking-wider uppercase text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-amber-300 to-rose-500 mb-3">
+            <h1 class="font-gaming text-4xl sm:text-6xl font-extrabold tracking-wider uppercase text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-amber-300 to-rose-500 mb-3 drop-shadow">
                 NGƯỜI QUE ĐẠI CHIẾN
             </h1>
-            <p class="text-slate-300 text-sm md:text-base max-w-xl mx-auto mb-6">
-                Đại chiến 3D với <b>26 Vũ Khí Hạng Nặng</b>, <b>7 Chế Độ Chơi</b>, <b>5 Bản Đồ Rộng Lớn</b>, <b>300 Máu</b> và <b>20 Bình Hồi Máu</b>. Hỗ trợ chơi 2 người 1 máy hoặc tạo Mã Phòng Online!
+            <p class="text-slate-300 text-sm md:text-base max-w-xl mx-auto mb-6 leading-relaxed">
+                Chiến binh Người Que 3D kích thước lớn với chuyển động khớp tay chân mượt mà, <b>26 Siêu Vũ Khí</b>, <b>7 Chế Độ Chơi</b>, <b>5 Bản Đồ</b>, <b>300 Máu</b> và <b>20 Bình Hồi Máu</b>!
             </p>
 
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-7 text-xs font-gaming font-bold">
-                <div class="p-2.5 rounded-xl bg-slate-900/90 border border-amber-500/30 text-amber-300">26 SIÊU VŨ KHÍ</div>
-                <div class="p-2.5 rounded-xl bg-slate-900/90 border border-cyan-500/30 text-cyan-300">7 CHẾ ĐỘ CHƠI</div>
-                <div class="p-2.5 rounded-xl bg-slate-900/90 border border-purple-500/30 text-purple-300">5 MAP RỘNG 56x38</div>
-                <div class="p-2.5 rounded-xl bg-slate-900/90 border border-emerald-500/30 text-emerald-300">300 HP • 20 BÌNH</div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-7 text-xs font-gaming font-bold">
+                <div class="p-2.5 rounded-xl bg-slate-900/90 border border-amber-500/40 text-amber-300">⚔️ 26 SIÊU VŨ KHÍ</div>
+                <div class="p-2.5 rounded-xl bg-slate-900/90 border border-cyan-500/40 text-cyan-300">🔥 7 CHẾ ĐỘ CHƠI</div>
+                <div class="p-2.5 rounded-xl bg-slate-900/90 border border-purple-500/40 text-purple-300">🗺️ 5 BẢN ĐỒ 3D</div>
+                <div class="p-2.5 rounded-xl bg-slate-900/90 border border-emerald-500/40 text-emerald-300">💚 300 HP • 20 BÌNH</div>
             </div>
 
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <button id="btn-lobby-offline" type="button" class="btn-game w-full sm:flex-1 py-4 px-5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-slate-950 font-gaming font-extrabold text-base md:text-lg tracking-wider uppercase shadow-xl flex items-center justify-center gap-2 border-2 border-amber-300">
                     <span>🎮 BẮT ĐẦU (2 NGƯỜI 1 MÁY)</span>
                 </button>
-                <button id="btn-lobby-online" type="button" class="btn-game w-full sm:flex-1 py-4 px-5 rounded-2xl bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 text-white font-gaming font-extrabold text-base md:text-lg tracking-wider uppercase shadow-xl flex items-center justify-center gap-2 border-2 border-blue-300">
+                <button id="btn-lobby-online" type="button" class="btn-game w-full sm:flex-1 py-4 px-5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 text-white font-gaming font-extrabold text-base md:text-lg tracking-wider uppercase shadow-xl flex items-center justify-center gap-2 border-2 border-blue-300">
                     <span>🌐 CHƠI ONLINE (MÃ PHÒNG)</span>
                 </button>
                 <button id="btn-lobby-exit" type="button" class="btn-game w-full sm:w-auto py-4 px-6 rounded-2xl bg-slate-800/90 hover:bg-rose-950/90 text-slate-200 hover:text-rose-300 font-gaming font-bold text-base md:text-lg uppercase border-2 border-slate-600 flex items-center justify-center gap-2">
@@ -143,7 +145,7 @@
     </div>
 
     <!-- 2. SETUP & ONLINE ROOM MENU OVERLAY -->
-    <div id="start-menu" class="hidden absolute inset-0 z-40 flex items-center justify-center p-2 md:p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
+    <div id="start-menu" class="hidden absolute inset-0 z-40 flex items-center justify-center p-2 md:p-4 bg-slate-950/75 backdrop-blur-md overflow-y-auto">
         <div class="glass-panel rounded-3xl max-w-7xl w-full p-3.5 md:p-5 border border-slate-700/80 my-auto max-h-[96vh] overflow-y-auto custom-scroll">
             
             <!-- Header -->
@@ -151,12 +153,12 @@
                 <button id="btn-return-lobby" type="button" class="btn-game px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-gaming font-bold text-slate-200 border border-slate-600 flex items-center gap-1.5">
                     ⬅ Về Sảnh Ngoài
                 </button>
-                <h2 class="font-gaming text-lg md:text-2xl font-extrabold uppercase text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-amber-300 to-rose-400">
+                <h2 class="font-gaming text-lg md:text-2xl font-extrabold uppercase text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-amber-300 to-rose-400">
                     THIẾT LẬP TRẬN ĐẤU • 26 VŨ KHÍ & 7 CHẾ ĐỘ
                 </h2>
                 <div class="flex items-center gap-2">
                     <span id="online-status-pill" class="hidden text-xs font-gaming font-bold px-3 py-1 rounded-xl bg-blue-500/20 border border-blue-400/40 text-blue-300">
-                        Chế Độ Online P2P
+                        🌐 Chế Độ Online P2P
                     </span>
                     <span class="text-xs font-gaming font-bold px-3 py-1 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
                         300 HP • 20 Bình Máu
@@ -165,12 +167,12 @@
             </div>
 
             <!-- ONLINE P2P ROOM PANEL -->
-            <div id="online-room-panel" class="hidden mb-4 p-3.5 rounded-2xl bg-indigo-950/50 border-2 border-indigo-400/40">
+            <div id="online-room-panel" class="hidden mb-4 p-3.5 rounded-2xl bg-indigo-950/55 border-2 border-indigo-400/50">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
                     <!-- Host Box -->
                     <div class="p-3 rounded-xl bg-slate-900/90 border border-blue-500/40">
                         <div class="text-xs font-gaming font-bold text-blue-300 uppercase mb-1 flex items-center justify-between">
-                            <span>👑 1. Tạo Phòng (Chủ Phòng - P1)</span>
+                            <span>👑 1. Chủ Phòng (Người Chơi 1)</span>
                             <button id="btn-create-room" type="button" class="btn-game px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-[11px] font-bold">Tạo Mã Mới</button>
                         </div>
                         <div class="flex items-center gap-2 mt-2">
@@ -178,7 +180,10 @@
                                 -----
                             </div>
                             <button id="btn-copy-code" type="button" class="btn-game px-3 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs font-bold text-slate-200">
-                                📋 Sao Chép Mã
+                                📋 Copy Mã
+                            </button>
+                            <button id="btn-copy-link" type="button" class="btn-game px-3 py-2.5 rounded-lg bg-indigo-700 hover:bg-indigo-600 border border-indigo-400 text-xs font-bold text-white" title="Sao chép link mời tự động vào phòng">
+                                🔗 Link Mời
                             </button>
                         </div>
                     </div>
@@ -186,11 +191,11 @@
                     <!-- Join Box -->
                     <div class="p-3 rounded-xl bg-slate-900/90 border border-rose-500/40">
                         <div class="text-xs font-gaming font-bold text-rose-300 uppercase mb-1">
-                            🔑 2. Vào Phòng (Khách - P2)
+                            🔑 2. Vào Phòng (Người Chơi 2)
                         </div>
                         <div class="flex items-center gap-2 mt-2">
                             <input id="input-join-code" type="text" maxlength="5" placeholder="Nhập mã 5 số..." class="flex-1 py-2 px-3 rounded-lg bg-slate-950 border border-slate-700 font-gaming font-extrabold text-lg tracking-widest text-white text-center uppercase focus:outline-none focus:border-rose-400" />
-                            <button id="btn-join-room" type="button" class="btn-game px-4 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-gaming font-bold text-xs uppercase">
+                            <button id="btn-join-room" type="button" class="btn-game px-4 py-2.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-gaming font-bold text-xs uppercase shadow-lg">
                                 Kết Nối
                             </button>
                         </div>
@@ -199,11 +204,11 @@
                     <!-- Connection Status Box -->
                     <div class="p-3 rounded-xl bg-slate-900/90 border border-emerald-500/40 flex flex-col justify-between h-full">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-gaming font-bold text-emerald-300 uppercase">Trạng Thái Mạng:</span>
-                            <span id="online-ping-badge" class="text-xs font-gaming font-bold text-amber-300">Ping: -- ms</span>
+                            <span class="text-xs font-gaming font-bold text-emerald-300 uppercase">Trạng Thái Đồng Bộ:</span>
+                            <span id="online-ping-badge" class="text-xs font-gaming font-bold px-2 py-0.5 rounded bg-slate-950 text-amber-300 border border-amber-500/30">Ping: -- ms</span>
                         </div>
-                        <div id="online-conn-msg" class="text-xs text-slate-300 my-1.5 font-medium">
-                            Hãy gửi Mã 5 Số cho bạn bè hoặc nhập mã vào ô bên cạnh để kết nối!
+                        <div id="online-conn-msg" class="text-xs text-slate-200 my-1.5 font-medium">
+                            Hãy gửi Mã 5 Số hoặc Link Mời cho bạn bè để kết nối trực tiếp!
                         </div>
                         <div class="text-[11px] text-cyan-300">
                             * Khi chơi Online: Cả 2 máy đều dùng <b>WASD</b> (Chạy) + <b>E</b> (Đánh) + <b>Q</b> (Hồi máu).
@@ -220,10 +225,10 @@
                 <div id="mode-list-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1.5"></div>
             </div>
 
-            <!-- 2. SELECT ARENA MAP (5 WIDE MAPS 56x38) -->
+            <!-- 2. SELECT ARENA MAP (5 MAPS) -->
             <div class="mb-3.5">
                 <label class="block text-xs uppercase tracking-wider text-cyan-300 font-gaming font-bold mb-1.5">
-                    2. CHỌN BẢN ĐỒ RỘNG LỚN (5 BẢN ĐỒ 56x38):
+                    2. CHỌN BẢN ĐỒ ĐẤU TRƯỜNG 3D (5 BẢN ĐỒ RỘNG LỚN):
                 </label>
                 <div id="map-list-container" class="grid grid-cols-2 sm:grid-cols-5 gap-2"></div>
             </div>
@@ -287,7 +292,7 @@
 
             <!-- Start Button -->
             <div class="mt-3.5 flex items-center justify-center">
-                <button id="btn-start-battle" type="button" class="btn-game w-full sm:w-auto min-w-[320px] py-3.5 px-10 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-slate-950 font-gaming font-extrabold text-lg tracking-wider uppercase shadow-xl flex items-center justify-center gap-2 border-2 border-amber-300">
+                <button id="btn-start-battle" type="button" class="btn-game w-full sm:w-auto min-w-[340px] py-3.5 px-10 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-slate-950 font-gaming font-extrabold text-lg tracking-wider uppercase shadow-xl flex items-center justify-center gap-2 border-2 border-amber-300">
                     <span>🔥 VÀO ĐẤU TRƯỜNG NGAY!</span>
                 </button>
             </div>
@@ -301,48 +306,48 @@
             <div class="flex-1 glass-panel rounded-2xl p-2.5 border-l-4 border-blue-500 pointer-events-auto">
                 <div class="flex items-center justify-between mb-1 flex-wrap gap-1">
                     <div class="flex items-center gap-1.5">
-                        <span id="hud-p1-dot" class="w-3 h-3 rounded-full bg-blue-500 inline-block ring-2 ring-white/40"></span>
+                        <span id="hud-p1-dot" class="w-3.5 h-3.5 rounded-full bg-blue-500 inline-block ring-2 ring-white/50"></span>
                         <span class="font-gaming font-bold text-xs md:text-sm text-white">P1</span>
                         <span id="hud-p1-weapon" class="text-[11px] font-semibold px-2 py-0.5 rounded bg-slate-800 text-amber-300 border border-amber-500/30">Katana</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <span id="hud-p1-potions" class="text-[11px] font-gaming font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/40">
-                            20/20 Bình (Q)
+                            🧪 20/20 Bình (Q)
                         </span>
-                        <span id="hud-p1-hp-text" class="font-gaming font-bold text-xs md:text-sm text-emerald-400">300 / 300</span>
+                        <span id="hud-p1-hp-text" class="font-gaming font-extrabold text-xs md:text-sm text-emerald-400">300 / 300</span>
                     </div>
                 </div>
-                <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-700">
-                    <div id="hud-p1-hp-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-100" style="width:100%"></div>
+                <div class="w-full h-3.5 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-700">
+                    <div id="hud-p1-hp-bar" class="h-full bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 rounded-full transition-all duration-100" style="width:100%"></div>
                 </div>
                 <div class="mt-1 flex items-center justify-between text-[10px] text-slate-400">
                     <span>WASD: Chạy • E: Đánh • Q: Hồi máu (2s)</span>
-                    <div class="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div class="w-20 h-1.5 bg-slate-800 rounded-full overflow-hidden">
                         <div id="hud-p1-cd-bar" class="h-full bg-amber-400" style="width:100%"></div>
                     </div>
                 </div>
             </div>
 
             <!-- CENTER HUD -->
-            <div class="flex flex-col items-center justify-center glass-panel px-3 py-1.5 rounded-2xl pointer-events-auto shrink-0 border border-slate-700">
+            <div class="flex flex-col items-center justify-center glass-panel px-3.5 py-1.5 rounded-2xl pointer-events-auto shrink-0 border border-slate-700">
                 <div class="flex items-center gap-2">
                     <span id="hud-mode-badge" class="text-[10px] uppercase tracking-wider text-amber-400 font-bold">CHẾ ĐỘ TỰ CHỌN</span>
-                    <span id="hud-online-ping" class="hidden text-[10px] font-gaming font-bold px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-300 border border-blue-400/30">Ping: 12ms</span>
+                    <span id="hud-online-ping" class="hidden text-[10px] font-gaming font-bold px-2 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-400/40">Ping: 12ms</span>
                 </div>
-                <div class="flex items-center gap-2.5 my-0.5">
-                    <span id="score-p1" class="font-gaming text-xl md:text-2xl font-bold text-blue-400">0</span>
-                    <span class="text-slate-500 font-gaming text-xs">VS</span>
-                    <span id="score-p2" class="font-gaming text-xl md:text-2xl font-bold text-rose-400">0</span>
+                <div class="flex items-center gap-3 my-0.5">
+                    <span id="score-p1" class="font-gaming text-xl md:text-2xl font-extrabold text-blue-400">0</span>
+                    <span class="text-slate-400 font-gaming text-xs font-bold">VS</span>
+                    <span id="score-p2" class="font-gaming text-xl md:text-2xl font-extrabold text-rose-400">0</span>
                 </div>
-                <div class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-[10px] text-amber-300 font-gaming font-bold mb-1">
-                    <span id="hud-airdrop-timer">Thính: 45s</span>
-                    <button id="btn-drop-now" type="button" class="px-1.5 py-0.2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded text-[9px] font-extrabold cursor-pointer">Thả Ngay</button>
+                <div class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-[10px] text-amber-300 font-gaming font-bold mb-1">
+                    <span id="hud-airdrop-timer">📦 Thính: 45s</span>
+                    <button id="btn-drop-now" type="button" class="px-1.5 py-0.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded text-[9px] font-extrabold cursor-pointer">Thả Ngay</button>
                 </div>
                 <div class="flex items-center gap-1">
-                    <button id="btn-open-menu" type="button" class="btn-game px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-200 border border-slate-600">
+                    <button id="btn-open-menu" type="button" class="btn-game px-2.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-200 border border-slate-600">
                         ⚙ Đổi Vũ Khí / Map
                     </button>
-                    <button id="btn-reset-cam" type="button" class="btn-game px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-200 border border-slate-600" title="Reset Camera">
+                    <button id="btn-reset-cam" type="button" class="btn-game px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-200 border border-slate-600" title="Đặt lại góc nhìn Camera">
                         🎥
                     </button>
                 </div>
@@ -352,22 +357,22 @@
             <div class="flex-1 glass-panel rounded-2xl p-2.5 border-r-4 border-rose-500 pointer-events-auto">
                 <div class="flex items-center justify-between mb-1 flex-wrap gap-1">
                     <div class="flex items-center gap-2">
-                        <span id="hud-p2-hp-text" class="font-gaming font-bold text-xs md:text-sm text-emerald-400">300 / 300</span>
+                        <span id="hud-p2-hp-text" class="font-gaming font-extrabold text-xs md:text-sm text-emerald-400">300 / 300</span>
                         <span id="hud-p2-potions" class="text-[11px] font-gaming font-bold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/40">
-                            20/20 Bình (Y)
+                            🧪 20/20 Bình (Y)
                         </span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <span id="hud-p2-weapon" class="text-[11px] font-semibold px-2 py-0.5 rounded bg-slate-800 text-cyan-300 border border-cyan-500/30">Súng</span>
                         <span class="font-gaming font-bold text-xs md:text-sm text-white">P2</span>
-                        <span id="hud-p2-dot" class="w-3 h-3 rounded-full bg-red-500 inline-block ring-2 ring-white/40"></span>
+                        <span id="hud-p2-dot" class="w-3.5 h-3.5 rounded-full bg-red-500 inline-block ring-2 ring-white/50"></span>
                     </div>
                 </div>
-                <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-700 flex justify-end">
-                    <div id="hud-p2-hp-bar" class="h-full bg-gradient-to-l from-emerald-500 to-teal-400 rounded-full transition-all duration-100" style="width:100%"></div>
+                <div class="w-full h-3.5 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-700 flex justify-end">
+                    <div id="hud-p2-hp-bar" class="h-full bg-gradient-to-l from-emerald-500 via-teal-400 to-cyan-400 rounded-full transition-all duration-100" style="width:100%"></div>
                 </div>
                 <div class="mt-1 flex items-center justify-between text-[10px] text-slate-400">
-                    <div class="w-16 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <div class="w-20 h-1.5 bg-slate-800 rounded-full overflow-hidden">
                         <div id="hud-p2-cd-bar" class="h-full bg-amber-400" style="width:100%"></div>
                     </div>
                     <span id="hud-p2-ctrl-hint">UHJK: Chạy • I: Đánh • Y: Hồi máu (2s)</span>
@@ -392,7 +397,7 @@
         </div>
 
         <div class="hidden md:flex items-center gap-2 glass-panel px-4 py-1.5 rounded-full text-xs text-slate-200 border border-amber-400/30">
-            <span>✨ Đứng im 2 giây khi bấm <b>Q</b> (P1) hoặc <b>Y</b> (P2) để uống Bình Máu (+65 HP)!</span>
+            <span>💡 Kéo chuột để xoay góc nhìn 3D • Cuộn chuột để Phóng to/Thu nhỏ • Đứng im 2s khi bấm <b>Q / Y</b> để uống Bình Máu (+65 HP)</span>
         </div>
 
         <div class="glass-panel px-2.5 py-1.5 rounded-xl flex items-center gap-2 pointer-events-auto">
@@ -411,17 +416,17 @@
 
     <!-- VICTORY MODAL -->
     <div id="victory-modal" class="hidden absolute inset-0 z-40 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-md">
-        <div class="glass-panel rounded-3xl max-w-md w-full p-6 text-center border border-amber-500/40">
-            <div class="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center mx-auto mb-3 text-3xl">
+        <div class="glass-panel rounded-3xl max-w-md w-full p-6 text-center border-2 border-amber-400/60">
+            <div class="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center mx-auto mb-3 text-4xl shadow-lg">
                 🏆
             </div>
             <h2 id="winner-title" class="font-gaming text-2xl md:text-3xl font-extrabold text-white mb-2">NGƯỜI CHƠI 1 CHIẾN THẮNG!</h2>
-            <p id="winner-subtitle" class="text-xs md:text-sm text-slate-300 mb-5">Pha kết liễu đỉnh cao trên đấu trường 3D!</p>
+            <p id="winner-subtitle" class="text-xs md:text-sm text-slate-300 mb-5">Màn kết liễu mãn nhãn trên đấu trường Người Que 3D!</p>
             <div class="flex gap-3 justify-center">
-                <button id="btn-rematch" type="button" class="btn-game flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-gaming font-bold text-sm uppercase">
-                    Đấu Hiệp Tiếp
+                <button id="btn-rematch" type="button" class="btn-game flex-1 py-3.5 px-4 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-gaming font-extrabold text-sm uppercase shadow-lg">
+                    ⚔️ Đấu Hiệp Tiếp
                 </button>
-                <button id="btn-back-menu" type="button" class="btn-game py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-gaming font-bold text-sm uppercase border border-slate-600">
+                <button id="btn-back-menu" type="button" class="btn-game py-3.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-gaming font-bold text-sm uppercase border border-slate-600">
                     Đổi Vũ Khí / Map
                 </button>
             </div>
@@ -429,72 +434,65 @@
     </div>
 
     <script>
-        // ============================================================================
-        // 1. CONFIGURATION: 5 SKIN COLORS, 7 MODES, 5 MAPS (56x38), 26 WEAPONS + UNARMED
-        // ============================================================================
         const SKIN_COLORS = [
-            { id: 'xanh', name: 'Xanh Dương', hex: 0x3b82f6, css: '#3b82f6' },
-            { id: 'do',   name: 'Đỏ Rực',     hex: 0xef4444, css: '#ef4444' },
-            { id: 'tim',  name: 'Tím Huyền',  hex: 0xa855f7, css: '#a855f7' },
-            { id: 'vang', name: 'Vàng Kim',   hex: 0xeab308, css: '#eab308' },
-            { id: 'den',  name: 'Đen Bóng Đêm', hex: 0x1e293b, css: '#1e293b' }
+            { id: 'xanh', name: 'Xanh Dương', hex: 0x3b82f6, glow: 0x60a5fa, css: '#3b82f6' },
+            { id: 'do',   name: 'Đỏ Rực',     hex: 0xef4444, glow: 0xf87171, css: '#ef4444' },
+            { id: 'tim',  name: 'Tím Huyền',  hex: 0xa855f7, glow: 0xc084fc, css: '#a855f7' },
+            { id: 'vang', name: 'Vàng Kim',   hex: 0xeab308, glow: 0xfacc15, css: '#eab308' },
+            { id: 'den',  name: 'Đen Bóng Đêm', hex: 0x1e293b, glow: 0x94a3b8, css: '#1e293b' }
         ];
 
         const GAME_MODES = [
-            { id: 'CUSTOM',     name: '1. Tự Chọn Vũ Khí + Thính', badge: '45s Thính', desc: 'Tự chọn 1 trong 26 vũ khí ngay từ đầu, thính rơi mỗi 45s.' },
+            { id: 'CUSTOM',     name: '1. Tự Chọn Vũ Khí + Thính', badge: '45s Thính', desc: 'Tự chọn 1 trong 26 siêu vũ khí ngay từ đầu, thính rơi mỗi 45s.' },
             { id: 'BAREHAND',   name: '2. Tay Không Săn Thính',    badge: '1 Máu / 60s', desc: 'Khởi đầu Tay Không (1 máu). Hòm thính rơi mỗi 60 giây!' },
             { id: 'GUNGAME',    name: '3. Đua Vũ Khí Luân Phiên',  badge: 'Đổi 12s', desc: 'Tự động đổi sang một vũ khí ngẫu nhiên mới mỗi 12 giây!' },
-            { id: 'METEOR',     name: '4. Bão Thiên Thạch & Thính', badge: '15s Thính', desc: 'Thiên thạch lửa rơi ngẫu nhiên & mưa hòm thính mỗi 15s!' },
-            { id: 'HYPERSPEED', name: '5. Siêu Tốc & Hồi Chiêu x2', badge: 'Tốc Độ x2', desc: 'Tăng 50% tốc độ di chuyển và giảm 50% hồi chiêu vũ khí!' },
-            { id: 'GIANT',      name: '6. Đại Chiến Khổng Lồ',     badge: '600 HP', desc: 'Chiến binh kích thước khổng lồ với 600 Máu!' },
+            { id: 'METEOR',     name: '4. Bão Thiên Thạch & Thính', badge: '15s Thính', desc: 'Thiên thạch lửa rơi liên hoàn & mưa hòm thính mỗi 15s!' },
+            { id: 'HYPERSPEED', name: '5. Siêu Tốc & Hồi Chiêu x2', badge: 'Tốc Độ x2', desc: 'Tăng 50% tốc độ chạy, để lại vệt gió và giảm 50% hồi chiêu!' },
+            { id: 'GIANT',      name: '6. Đại Chiến Khổng Lồ',     badge: '600 HP', desc: 'Chiến binh kích thước Khổng Lồ (Scale 2.3x) với 600 Máu!' },
             { id: 'FATEWHEEL',  name: '7. Vòng Quay Định Mệnh',    badge: 'Đổi Đồ Khi Hồi', desc: 'Mỗi lần uống Bình Máu thành công sẽ nhận 1 siêu vũ khí mới!' }
         ];
 
         const ARENA_MAPS = [
-            { id: 'cyber',   name: '1. Đấu Trường Cyber',   sky: 0x060913, floor: 0x0f172a, grid1: 0x38bdf8, grid2: 0x1e293b, pillar: 0x1e293b, ring: 0x38bdf8 },
-            { id: 'desert',  name: '2. Sa Mạc Pharaon',     sky: 0x241608, floor: 0xb45309, grid1: 0xfbbf24, grid2: 0x78350f, pillar: 0x92400e, ring: 0xfef08a },
-            { id: 'volcano', name: '3. Hỏa Diệm Sơn',       sky: 0x1f0606, floor: 0x2a0a0a, grid1: 0xef4444, grid2: 0x450a0a, pillar: 0x450a0a, ring: 0xf97316 },
-            { id: 'arctic',  name: '4. Băng Đảo Bắc Cực',   sky: 0x071929, floor: 0x0c4a6e, grid1: 0x7dd3fc, grid2: 0x0369a1, pillar: 0x0284c7, ring: 0xe0f2fe },
+            { id: 'cyber',   name: '1. Đấu Trường Cyber',    sky: 0x050914, floor: 0x0f172a, grid1: 0x38bdf8, grid2: 0x1e293b, pillar: 0x1e293b, ring: 0x38bdf8 },
+            { id: 'desert',  name: '2. Sa Mạc Pharaon',      sky: 0x211306, floor: 0x92400e, grid1: 0xfbbf24, grid2: 0x78350f, pillar: 0xb45309, ring: 0xfef08a },
+            { id: 'volcano', name: '3. Hỏa Diệm Sơn',        sky: 0x1c0505, floor: 0x2a0808, grid1: 0xef4444, grid2: 0x450a0a, pillar: 0x450a0a, ring: 0xf97316 },
+            { id: 'arctic',  name: '4. Băng Đảo Bắc Cực',    sky: 0x061626, floor: 0x0c4a6e, grid1: 0x7dd3fc, grid2: 0x0369a1, pillar: 0x0284c7, ring: 0xe0f2fe },
             { id: 'space',   name: '5. Trạm Vũ Trụ Ngân Hà', sky: 0x050212, floor: 0x1e1b4b, grid1: 0xa855f7, grid2: 0x312e81, pillar: 0x312e81, ring: 0xe879f9 }
         ];
 
-        // 26 Selectable Weapons + Unarmed (1 HP)
         const WEAPON_SPECS = {
-            unarmed:       { id: 'unarmed',       name: 'Tay Không (1 HP)',         type: 'melee',  dmg: 1,  cd: 0.28, range: 2.6, kb: 3.5, speed: 1.12, hex: 0x94a3b8, menu: false },
-            katana:        { id: 'katana',        name: '1. Kiếm Katana',           type: 'melee',  dmg: 32, cd: 0.44, range: 4.3, kb: 12,  speed: 1.08, hex: 0x38bdf8, menu: true },
-            gun:           { id: 'gun',           name: '2. Vũ Khí Súng',           type: 'bullet', dmg: 22, cd: 0.36, bSpeed: 34, kb: 5,   speed: 1.00, hex: 0x22d3ee, menu: true },
-            grenade:       { id: 'grenade',       name: '3. Bom Ném',               type: 'lob',    dmg: 42, cd: 0.78, bSpeed: 19, rad: 5.5, kb: 16, speed: 1.02, hex: 0x22c55e, menu: true },
-            rocket:        { id: 'rocket',        name: '4. Tên Lửa RPG',           type: 'rocket', dmg: 48, cd: 1.00, bSpeed: 26, rad: 6.0, kb: 19, speed: 0.96, hex: 0xef4444, menu: true },
-            robot:         { id: 'robot',         name: '5. Biến Hình Robot',       type: 'robot',  dmg: 44, cd: 0.62, bSpeed: 30, range: 5.0, kb: 18, speed: 0.98, hex: 0xa855f7, menu: true },
-            airstrike:     { id: 'airstrike',     name: '6. Máy Bay Thả Bom',       type: 'airstrike', dmg: 36, cd: 1.85, rad: 5.2, kb: 15, speed: 1.00, hex: 0x84cc16, menu: true },
-            lasersword:    { id: 'lasersword',    name: '7. Kiếm Ánh Sáng Laser',   type: 'melee',  dmg: 38, cd: 0.34, range: 4.5, kb: 11,  speed: 1.12, hex: 0x10b981, menu: true },
-            awp:           { id: 'awp',           name: '8. Súng Ngắm AWP',         type: 'bullet', dmg: 68, cd: 1.20, bSpeed: 58, kb: 16,  speed: 0.94, hex: 0xfacc15, menu: true },
-            shotgun:       { id: 'shotgun',       name: '9. Súng Hoa Cải Shotgun',  type: 'shotgun',dmg: 14, pellets: 6, cd: 0.72, bSpeed: 29, kb: 8, speed: 1.00, hex: 0xf97316, menu: true },
-            minigun:       { id: 'minigun',       name: '10. Súng Máy 6 Nòng',      type: 'bullet', dmg: 9,  cd: 0.12, bSpeed: 34, kb: 2,   speed: 0.92, hex: 0xeab308, menu: true },
-            flamethrower:  { id: 'flamethrower',  name: '11. Súng Phun Lửa Rồng',   type: 'flame',  dmg: 13, cd: 0.15, bSpeed: 20, kb: 2.5, speed: 1.00, hex: 0xff4500, menu: true },
-            icestaff:      { id: 'icestaff',      name: '12. Trượng Băng Vĩnh Cửu', type: 'ice',    dmg: 36, cd: 0.75, bSpeed: 26, rad: 4.8, kb: 10, speed: 1.02, hex: 0x38bdf8, menu: true },
-            thorhammer:    { id: 'thorhammer',    name: '13. Búa Sấm Sét Thor',     type: 'thor',   dmg: 52, cd: 0.95, range: 6.2, kb: 20,  speed: 1.04, hex: 0x60a5fa, menu: true },
-            scythe:        { id: 'scythe',        name: '14. Lưỡi Hái Tử Thần',     type: 'scythe', dmg: 38, heal: 18, cd: 0.55, range: 5.0, kb: 13, speed: 1.06, hex: 0xc084fc, menu: true },
-            boomerang:     { id: 'boomerang',     name: '15. Phi Tiêu Boomerang',   type: 'boomerang', dmg: 30, cd: 0.58, bSpeed: 27, kb: 9, speed: 1.08, hex: 0x2dd4bf, menu: true },
-            deathray:      { id: 'deathray',      name: '16. Đại Bác Tia Chết Chóc',type: 'beam',   dmg: 54, cd: 1.10, range: 26,  kb: 18,  speed: 0.95, hex: 0xe879f9, menu: true },
-            blackhole:     { id: 'blackhole',     name: '17. Súng Hố Đen Vũ Trụ',   type: 'blackhole', dmg: 52, cd: 1.15, bSpeed: 19, rad: 7.2, kb: -16, speed: 0.96, hex: 0x6366f1, menu: true },
-            meteorstaff:   { id: 'meteorstaff',   name: '18. Trượng Thiên Thạch',   type: 'meteor', dmg: 58, cd: 1.35, rad: 6.2, kb: 22,  speed: 0.98, hex: 0xfb7185, menu: true },
-            shuriken:      { id: 'shuriken',      name: '19. Phi Tiêu Ninja 3 Cánh',type: 'shuriken',dmg: 18, pellets: 3, cd: 0.45, bSpeed: 32, kb: 6, speed: 1.12, hex: 0x94a3b8, menu: true },
-            poisonbow:     { id: 'poisonbow',     name: '20. Cung Tên Độc Dược',    type: 'poison', dmg: 24, cd: 0.52, bSpeed: 36, kb: 6,   speed: 1.06, hex: 0x4ade80, menu: true },
-            teslagun:      { id: 'teslagun',      name: '21. Súng Điện Từ Tesla',   type: 'beam',   dmg: 36, cd: 0.62, range: 16,  kb: 11,  speed: 1.02, hex: 0x38bdf8, menu: true },
-            chainsaw:      { id: 'chainsaw',      name: '22. Cưa Máy Hủy Diệt',     type: 'melee',  dmg: 14, cd: 0.14, range: 3.4, kb: 3.5, speed: 1.04, hex: 0xef4444, menu: true },
-            lightspear:    { id: 'lightspear',    name: '23. Thương Ánh Sáng',      type: 'melee',  dmg: 42, cd: 0.52, range: 5.5, kb: 15,  speed: 1.10, hex: 0xfef08a, menu: true },
-            gravityhammer: { id: 'gravityhammer', name: '24. Búa Trọng Lực',        type: 'gravity',dmg: 46, cd: 0.88, range: 5.2, kb: 24,  speed: 1.00, hex: 0x818cf8, menu: true },
-            drones:        { id: 'drones',        name: '25. Bầy Drone Tự Sát',     type: 'drones', dmg: 22, cd: 1.15, bSpeed: 21, rad: 3.5, kb: 9, speed: 1.02, hex: 0x2dd4bf, menu: true },
-            mininuke:      { id: 'mininuke',      name: '26. Đầu Đạn Hạt Nhân Mini',type: 'rocket', dmg: 75, cd: 1.75, bSpeed: 21, rad: 8.5, kb: 28, speed: 0.90, hex: 0xa3e635, menu: true }
+            unarmed:       { id: 'unarmed',       name: 'Tay Không (1 HP)',          type: 'melee',     dmg: 1,  cd: 0.26, range: 3.4, kb: 4.5, speed: 1.15, hex: 0x94a3b8, menu: false },
+            katana:        { id: 'katana',        name: '1. Kiếm Katana',            type: 'melee',     dmg: 32, cd: 0.42, range: 5.2, kb: 13,  speed: 1.10, hex: 0x38bdf8, menu: true },
+            gun:           { id: 'gun',           name: '2. Vũ Khí Súng',            type: 'bullet',    dmg: 22, cd: 0.34, bSpeed: 38, kb: 6,   speed: 1.02, hex: 0x22d3ee, menu: true },
+            grenade:       { id: 'grenade',       name: '3. Bom Ném',                type: 'lob',       dmg: 42, cd: 0.75, bSpeed: 21, rad: 6.2, kb: 17, speed: 1.02, hex: 0x22c55e, menu: true },
+            rocket:        { id: 'rocket',        name: '4. Tên Lửa RPG',            type: 'rocket',    dmg: 48, cd: 0.95, bSpeed: 29, rad: 6.8, kb: 20, speed: 0.96, hex: 0xef4444, menu: true },
+            robot:         { id: 'robot',         name: '5. Biến Hình Robot',        type: 'robot',     dmg: 44, cd: 0.58, bSpeed: 32, range: 5.8, kb: 19, speed: 1.00, hex: 0xa855f7, menu: true },
+            airstrike:     { id: 'airstrike',     name: '6. Máy Bay Thả Bom',        type: 'airstrike', dmg: 38, cd: 1.75, rad: 5.8, kb: 16,  speed: 1.02, hex: 0x84cc16, menu: true },
+            lasersword:    { id: 'lasersword',    name: '7. Kiếm Ánh Sáng Laser',    type: 'melee',     dmg: 38, cd: 0.32, range: 5.4, kb: 12,  speed: 1.14, hex: 0x10b981, menu: true },
+            awp:           { id: 'awp',           name: '8. Súng Ngắm AWP',          type: 'bullet',    dmg: 68, cd: 1.15, bSpeed: 64, kb: 18,  speed: 0.95, hex: 0xfacc15, menu: true },
+            shotgun:       { id: 'shotgun',       name: '9. Súng Hoa Cải Shotgun',   type: 'shotgun',   dmg: 14, pellets: 6, cd: 0.68, bSpeed: 32, kb: 9, speed: 1.02, hex: 0xf97316, menu: true },
+            minigun:       { id: 'minigun',       name: '10. Súng Máy 6 Nòng',       type: 'bullet',    dmg: 9,  cd: 0.11, bSpeed: 38, kb: 2.5, speed: 0.94, hex: 0xeab308, menu: true },
+            flamethrower:  { id: 'flamethrower',  name: '11. Súng Phun Lửa Rồng',    type: 'flame',     dmg: 13, cd: 0.14, bSpeed: 22, kb: 3.0, speed: 1.02, hex: 0xff4500, menu: true },
+            icestaff:      { id: 'icestaff',      name: '12. Trượng Băng Vĩnh Cửu',  type: 'ice',       dmg: 36, cd: 0.72, bSpeed: 28, rad: 5.2, kb: 11, speed: 1.02, hex: 0x38bdf8, menu: true },
+            thorhammer:    { id: 'thorhammer',    name: '13. Búa Sấm Sét Thor',      type: 'thor',      dmg: 52, cd: 0.90, range: 6.8, kb: 22,  speed: 1.05, hex: 0x60a5fa, menu: true },
+            scythe:        { id: 'scythe',        name: '14. Lưỡi Hái Tử Thần',      type: 'scythe',    dmg: 38, heal: 18, cd: 0.52, range: 5.8, kb: 14, speed: 1.08, hex: 0xc084fc, menu: true },
+            boomerang:     { id: 'boomerang',     name: '15. Phi Tiêu Boomerang',    type: 'boomerang', dmg: 30, cd: 0.55, bSpeed: 30, kb: 10,  speed: 1.10, hex: 0x2dd4bf, menu: true },
+            deathray:      { id: 'deathray',      name: '16. Đại Bác Tia Chết Chóc', type: 'beam',      dmg: 54, cd: 1.05, range: 30,  kb: 19,  speed: 0.96, hex: 0xe879f9, menu: true },
+            blackhole:     { id: 'blackhole',     name: '17. Súng Hố Đen Vũ Trụ',    type: 'blackhole', dmg: 52, cd: 1.10, bSpeed: 20, rad: 8.0, kb: -18, speed: 0.98, hex: 0x6366f1, menu: true },
+            meteorstaff:   { id: 'meteorstaff',   name: '18. Trượng Thiên Thạch',    type: 'meteor',    dmg: 58, cd: 1.25, rad: 6.8, kb: 24,  speed: 1.00, hex: 0xfb7185, menu: true },
+            shuriken:      { id: 'shuriken',      name: '19. Phi Tiêu Ninja 3 Cánh', type: 'shuriken',  dmg: 18, pellets: 3, cd: 0.42, bSpeed: 36, kb: 7, speed: 1.14, hex: 0x94a3b8, menu: true },
+            poisonbow:     { id: 'poisonbow',     name: '20. Cung Tên Độc Dược',     type: 'poison',    dmg: 24, cd: 0.48, bSpeed: 40, kb: 7,   speed: 1.08, hex: 0x4ade80, menu: true },
+            teslagun:      { id: 'teslagun',      name: '21. Súng Điện Từ Tesla',    type: 'beam',      dmg: 36, cd: 0.58, range: 19,  kb: 12,  speed: 1.04, hex: 0x38bdf8, menu: true },
+            chainsaw:      { id: 'chainsaw',      name: '22. Cưa Máy Hủy Diệt',      type: 'melee',     dmg: 15, cd: 0.13, range: 4.4, kb: 4.0, speed: 1.06, hex: 0xef4444, menu: true },
+            lightspear:    { id: 'lightspear',    name: '23. Thương Ánh Sáng',       type: 'melee',     dmg: 42, cd: 0.48, range: 6.4, kb: 16,  speed: 1.12, hex: 0xfef08a, menu: true },
+            gravityhammer: { id: 'gravityhammer', name: '24. Búa Trọng Lực',         type: 'gravity',   dmg: 46, cd: 0.85, range: 6.0, kb: 25,  speed: 1.02, hex: 0x818cf8, menu: true },
+            drones:        { id: 'drones',        name: '25. Bầy Drone Tự Sát',      type: 'drones',    dmg: 22, cd: 1.10, bSpeed: 24, rad: 4.0, kb: 10, speed: 1.04, hex: 0x2dd4bf, menu: true },
+            mininuke:      { id: 'mininuke',      name: '26. Đầu Đạn Hạt Nhân Mini', type: 'rocket',    dmg: 75, cd: 1.65, bSpeed: 23, rad: 9.5, kb: 30, speed: 0.92, hex: 0xa3e635, menu: true }
         };
         const WEAPON_KEYS = Object.keys(WEAPON_SPECS).filter(k => WEAPON_SPECS[k].menu);
 
-        // ============================================================================
-        // 2. SOUND SYNTHESIZER (Web Audio API)
-        // ============================================================================
         let audioCtx = null;
-        function playTone(freq, type = 'sine', dur = 0.12, vol = 0.12) {
+        function playSound(freq, type = 'sine', dur = 0.14, vol = 0.14, slideFreq = null) {
             try {
                 if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -502,7 +500,7 @@
                 const gain = audioCtx.createGain();
                 osc.type = type;
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(Math.max(40, freq * 0.35), audioCtx.currentTime + dur);
+                osc.frequency.exponentialRampToValueAtTime(slideFreq || Math.max(35, freq * 0.3), audioCtx.currentTime + dur);
                 gain.gain.setValueAtTime(vol, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
                 osc.connect(gain);
@@ -512,9 +510,6 @@
             } catch (e) {}
         }
 
-        // ============================================================================
-        // 3. GAME STATE & ONLINE PEERJS P2P STATE
-        // ============================================================================
         const ARENA_W = 56, ARENA_D = 38;
         let gameState = {
             inBattle: false,
@@ -527,7 +522,8 @@
             scores: { p1: 0, p2: 0 },
             airdropTimer: 45,
             gunGameTimer: 12,
-            meteorTimer: 2.5,
+            meteorTimer: 2.2,
+            screenShake: 0,
             p1Config: { colorId: 'xanh', weaponId: 'katana' },
             p2Config: { colorId: 'do',   weaponId: 'gun' }
         };
@@ -536,32 +532,41 @@
         let conn = null;
         let remoteInput = { moveX: 0, moveZ: 0, attack: false, heal: false };
         let lastPingSent = 0;
+        let lastSnapSent = 0;
 
-        // ============================================================================
-        // 4. THREE.JS 3D SCENE & WIDE ARENA BUILDER
-        // ============================================================================
+        // Three.js Scene & Renderer
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x060913);
-        scene.fog = new THREE.FogExp2(0x060913, 0.012);
+        scene.background = new THREE.Color(0x050914);
+        scene.fog = new THREE.FogExp2(0x050914, 0.009);
 
-        const camera = new THREE.PerspectiveCamera(48, window.innerWidth / window.innerHeight, 0.1, 250);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const camera = new THREE.PerspectiveCamera(44, window.innerWidth / window.innerHeight, 0.1, 260);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         container.appendChild(renderer.domElement);
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.72);
-        scene.add(ambientLight);
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.92);
-        dirLight.position.set(22, 38, 24);
+        // Enhanced 3-Point Lighting
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 0.85);
+        scene.add(hemiLight);
+
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.15);
+        dirLight.position.set(24, 42, 26);
         dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.camera.left = -35;
+        dirLight.shadow.camera.right = 35;
+        dirLight.shadow.camera.top = 30;
+        dirLight.shadow.camera.bottom = -30;
         scene.add(dirLight);
 
         const arenaGroup = new THREE.Group();
         scene.add(arenaGroup);
         let arenaObstacles = [];
+        let ambientStars = null;
 
         function buildArenaMap(mapId) {
             while (arenaGroup.children.length > 0) arenaGroup.remove(arenaGroup.children[0]);
@@ -570,68 +575,185 @@
             scene.background.setHex(m.sky);
             scene.fog.color.setHex(m.sky);
 
-            // Floor 56 x 38
+            // Main Floor
             const floor = new THREE.Mesh(
-                new THREE.BoxGeometry(ARENA_W, 1.2, ARENA_D),
-                new THREE.MeshStandardMaterial({ color: m.floor, roughness: 0.7, metalness: 0.2 })
+                new THREE.BoxGeometry(ARENA_W, 1.5, ARENA_D),
+                new THREE.MeshStandardMaterial({ color: m.floor, roughness: 0.55, metalness: 0.25 })
             );
-            floor.position.y = -0.6;
+            floor.position.y = -0.75;
             floor.receiveShadow = true;
             arenaGroup.add(floor);
 
+            // Glowing Grid
             const grid = new THREE.GridHelper(ARENA_W, 28, m.grid1, m.grid2);
             grid.scale.z = ARENA_D / ARENA_W;
             grid.position.y = 0.02;
             arenaGroup.add(grid);
 
+            // Center Arena Ring Emblem
+            const centerRing = new THREE.Mesh(
+                new THREE.RingGeometry(4.2, 4.7, 48),
+                new THREE.MeshBasicMaterial({ color: m.grid1, side: THREE.DoubleSide, transparent: true, opacity: 0.45 })
+            );
+            centerRing.rotation.x = -Math.PI / 2;
+            centerRing.position.y = 0.03;
+            arenaGroup.add(centerRing);
+
             // Glowing Border Walls
-            const wallMat = new THREE.MeshStandardMaterial({ color: m.grid1, emissive: m.grid1, emissiveIntensity: 0.35 });
-            const wNorth = new THREE.Mesh(new THREE.BoxGeometry(ARENA_W, 1.2, 0.5), wallMat);
-            wNorth.position.set(0, 0.6, -ARENA_D / 2);
+            const wallMat = new THREE.MeshStandardMaterial({ color: m.grid1, emissive: m.grid1, emissiveIntensity: 0.5 });
+            const wNorth = new THREE.Mesh(new THREE.BoxGeometry(ARENA_W + 0.6, 1.3, 0.6), wallMat);
+            wNorth.position.set(0, 0.65, -ARENA_D / 2);
             const wSouth = wNorth.clone(); wSouth.position.z = ARENA_D / 2;
-            const wWest = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.2, ARENA_D), wallMat);
-            wWest.position.set(-ARENA_W / 2, 0.6, 0);
+            const wWest = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.3, ARENA_D + 0.6), wallMat);
+            wWest.position.set(-ARENA_W / 2, 0.65, 0);
             const wEast = wWest.clone(); wEast.position.x = ARENA_W / 2;
             arenaGroup.add(wNorth, wSouth, wWest, wEast);
 
-            // 6 Tactical Pillars
+            // 6 Tactical Cover Pillars
             const coords = [
-                { x: -14, z: -8, r: 1.4 }, { x: 14, z: -8, r: 1.4 },
-                { x: -14, z: 8,  r: 1.4 }, { x: 14, z: 8,  r: 1.4 },
-                { x: 0,   z: -9, r: 1.5 }, { x: 0,  z: 9,  r: 1.5 }
+                { x: -14, z: -8.5, r: 1.45 }, { x: 14, z: -8.5, r: 1.45 },
+                { x: -14, z: 8.5,  r: 1.45 }, { x: 14, z: 8.5,  r: 1.45 },
+                { x: 0,   z: -9.5, r: 1.55 }, { x: 0,  z: 9.5,  r: 1.55 }
             ];
             coords.forEach(c => {
                 const pillar = new THREE.Mesh(
-                    new THREE.CylinderGeometry(c.r, c.r * 1.1, 4.2, 16),
-                    new THREE.MeshStandardMaterial({ color: m.pillar, roughness: 0.4, metalness: 0.5 })
+                    new THREE.CylinderGeometry(c.r, c.r * 1.12, 4.6, 20),
+                    new THREE.MeshStandardMaterial({ color: m.pillar, roughness: 0.35, metalness: 0.55 })
                 );
-                pillar.position.set(c.x, 2.1, c.z);
+                pillar.position.set(c.x, 2.3, c.z);
                 pillar.castShadow = true;
+                pillar.receiveShadow = true;
                 arenaGroup.add(pillar);
 
                 const ring = new THREE.Mesh(
-                    new THREE.TorusGeometry(c.r * 1.08, 0.1, 10, 24),
+                    new THREE.TorusGeometry(c.r * 1.08, 0.12, 12, 28),
                     new THREE.MeshBasicMaterial({ color: m.ring })
                 );
                 ring.rotation.x = Math.PI / 2;
-                ring.position.set(c.x, 1.2, c.z);
+                ring.position.set(c.x, 1.6, c.z);
                 arenaGroup.add(ring);
+
+                const topCap = ring.clone();
+                topCap.position.y = 4.2;
+                arenaGroup.add(topCap);
+
                 arenaObstacles.push(c);
             });
+
+            // Floating Ambient Energy Particles in Background
+            const starGeo = new THREE.BufferGeometry();
+            const starPositions = new Float32Array(180 * 3);
+            for (let i = 0; i < 180; i++) {
+                starPositions[i * 3] = (Math.random() - 0.5) * 110;
+                starPositions[i * 3 + 1] = Math.random() * 35 + 2;
+                starPositions[i * 3 + 2] = (Math.random() - 0.5) * 90;
+            }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+            ambientStars = new THREE.Points(
+                starGeo,
+                new THREE.PointsMaterial({ color: m.ring, size: 0.45, transparent: true, opacity: 0.65 })
+            );
+            arenaGroup.add(ambientStars);
         }
 
-        // ============================================================================
-        // 5. STICKMAN 3D FIGHTER CLASS (WITH MECHA ARMOR & 26 WEAPONS)
-        // ============================================================================
+        function lerpAngle(a, b, t) {
+            let diff = b - a;
+            while (diff < -Math.PI) diff += Math.PI * 2;
+            while (diff > Math.PI) diff -= Math.PI * 2;
+            return a + diff * Math.min(1, t);
+        }
+
+        function addScreenShake(amount) {
+            gameState.screenShake = Math.min(1.8, Math.max(gameState.screenShake, amount));
+        }
+
+        function buildDetailed3DWeaponMesh(weaponId, spec) {
+            const group = new THREE.Group();
+            if (weaponId === 'unarmed') return group;
+
+            const glowMat = new THREE.MeshStandardMaterial({
+                color: spec.hex, emissive: spec.hex, emissiveIntensity: 0.65, metalness: 0.5, roughness: 0.2
+            });
+            const darkMetal = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.25 });
+            const silverMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.15 });
+
+            if (['katana', 'lasersword'].includes(weaponId)) {
+                const hilt = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.55, 10), darkMetal);
+                hilt.rotation.x = Math.PI / 2;
+                const guard = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.12, 0.08), glowMat);
+                guard.position.z = 0.28;
+                const blade = new THREE.Mesh(
+                    weaponId === 'lasersword'
+                        ? new THREE.CylinderGeometry(0.055, 0.055, 2.2, 12)
+                        : new THREE.BoxGeometry(0.06, 0.14, 2.15),
+                    glowMat
+                );
+                if (weaponId === 'lasersword') blade.rotation.x = Math.PI / 2;
+                blade.position.z = 1.38;
+                group.add(hilt, guard, blade);
+            } else if (weaponId === 'scythe') {
+                const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.05, 2.35, 10), darkMetal);
+                pole.rotation.x = Math.PI / 2;
+                pole.position.z = 0.9;
+                const crescent = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.08, 0.32), glowMat);
+                crescent.position.set(0.38, 0, 2.0);
+                crescent.rotation.y = -0.35;
+                group.add(pole, crescent);
+            } else if (weaponId === 'lightspear') {
+                const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.3, 10), darkMetal);
+                shaft.rotation.x = Math.PI / 2;
+                shaft.position.z = 0.95;
+                const tip = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.7, 12), glowMat);
+                tip.rotation.x = Math.PI / 2;
+                tip.position.z = 2.35;
+                group.add(shaft, tip);
+            } else if (['thorhammer', 'gravityhammer'].includes(weaponId)) {
+                const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.06, 1.45, 10), darkMetal);
+                handle.rotation.x = Math.PI / 2;
+                handle.position.z = 0.55;
+                const head = new THREE.Mesh(new THREE.BoxGeometry(0.68, 0.62, 0.98), glowMat);
+                head.position.z = 1.25;
+                group.add(handle, head);
+            } else if (weaponId === 'chainsaw') {
+                const body = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.36, 0.65), glowMat);
+                body.position.z = 0.25;
+                const sawBlade = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.24, 1.35), silverMat);
+                sawBlade.position.z = 1.1;
+                group.add(body, sawBlade);
+            } else if (['icestaff', 'meteorstaff'].includes(weaponId)) {
+                const staff = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.045, 2.1, 10), darkMetal);
+                staff.rotation.x = Math.PI / 2;
+                staff.position.z = 0.85;
+                const orb = new THREE.Mesh(new THREE.OctahedronGeometry(0.28, 1), glowMat);
+                orb.position.z = 2.05;
+                group.add(staff, orb);
+            } else if (['rocket', 'mininuke', 'blackhole', 'deathray'].includes(weaponId)) {
+                const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.22, 1.55, 14), darkMetal);
+                tube.rotation.x = Math.PI / 2;
+                tube.position.z = 0.55;
+                const warhead = new THREE.Mesh(new THREE.SphereGeometry(0.24, 12, 12), glowMat);
+                warhead.position.z = 1.35;
+                group.add(tube, warhead);
+            } else {
+                const stock = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.28, 0.55), darkMetal);
+                stock.position.z = 0.15;
+                const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.085, 1.15, 12), glowMat);
+                barrel.rotation.x = Math.PI / 2;
+                barrel.position.set(0, 0.06, 0.85);
+                group.add(stock, barrel);
+            }
+            return group;
+        }
+
         class StickmanFighter {
             constructor(id, spawnX, facingAngle) {
                 this.id = id;
                 this.spawnX = spawnX;
                 this.facingAngle = facingAngle;
+                this.targetAngle = facingAngle;
                 this.maxHp = 300;
                 this.hp = 300;
                 this.potions = 20;
-                this.maxPotions = 20;
                 this.isHealing = false;
                 this.healTimer = 0;
                 this.weaponId = 'katana';
@@ -643,94 +765,186 @@
                 this.poisonTimer = 0;
                 this.poisonTick = 0;
                 this.swingTimer = 0;
+                this.hitFlashTimer = 0;
                 this.walkCycle = 0;
+                this.idleTime = Math.random() * 5;
+                this.stepParticleTimer = 0;
+
+                // Network interpolation targets for smooth 60FPS Online play
+                this.netTargetPos = new THREE.Vector3(spawnX, 0, 0);
+                this.netTargetVel = new THREE.Vector3(0, 0, 0);
+                this.netTargetAngle = facingAngle;
 
                 this.root = new THREE.Group();
                 this.root.position.set(spawnX, 0, 0);
+                this.root.rotation.y = facingAngle;
                 scene.add(this.root);
 
-                this.buildBody();
+                this.buildArticulatedBody();
             }
 
-            buildBody() {
+            buildArticulatedBody() {
                 while (this.root.children.length > 0) this.root.remove(this.root.children[0]);
                 const skin = SKIN_COLORS.find(s => s.id === this.colorId) || SKIN_COLORS[0];
-                this.skinMat = new THREE.MeshStandardMaterial({ color: skin.hex, roughness: 0.35, metalness: 0.25 });
-                const darkMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, roughness: 0.5 });
 
-                // Healing Ground Ring
+                this.skinMat = new THREE.MeshStandardMaterial({
+                    color: skin.hex, emissive: skin.hex, emissiveIntensity: 0.14, roughness: 0.3, metalness: 0.25
+                });
+                this.limbMat = new THREE.MeshStandardMaterial({
+                    color: 0x0f172a, roughness: 0.45, metalness: 0.35
+                });
+                this.glowMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+
+                // Player Aura Ring under feet
+                this.auraRing = new THREE.Mesh(
+                    new THREE.RingGeometry(0.75, 0.98, 32),
+                    new THREE.MeshBasicMaterial({ color: skin.glow, side: THREE.DoubleSide, transparent: true, opacity: 0.65 })
+                );
+                this.auraRing.rotation.x = -Math.PI / 2;
+                this.auraRing.position.y = 0.04;
+                this.root.add(this.auraRing);
+
+                // Healing Channel Ring
                 this.healRing = new THREE.Mesh(
-                    new THREE.RingGeometry(1.1, 1.45, 32),
+                    new THREE.RingGeometry(1.15, 1.55, 36),
                     new THREE.MeshBasicMaterial({ color: 0x10b981, side: THREE.DoubleSide })
                 );
                 this.healRing.rotation.x = -Math.PI / 2;
-                this.healRing.position.y = 0.06;
+                this.healRing.position.y = 0.07;
                 this.healRing.visible = false;
                 this.root.add(this.healRing);
 
-                // Torso & Head
-                this.torso = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.2, 1.35, 12), this.skinMat);
-                this.torso.position.y = 1.65;
-                this.root.add(this.torso);
+                // Hips & Upper Body Group (Allows smooth breathing, jumping & running lean)
+                this.bodyPivot = new THREE.Group();
+                this.bodyPivot.position.y = 1.1;
+                this.root.add(this.bodyPivot);
 
-                this.head = new THREE.Mesh(new THREE.SphereGeometry(0.42, 18, 18), this.skinMat);
-                this.head.position.y = 2.65;
-                this.root.add(this.head);
+                // Muscular Stickman Torso
+                this.torso = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.23, 1.35, 16), this.skinMat);
+                this.torso.position.y = 0.7;
+                this.torso.castShadow = true;
+                this.bodyPivot.add(this.torso);
 
-                const headband = new THREE.Mesh(
-                    new THREE.CylinderGeometry(0.43, 0.43, 0.14, 16),
-                    new THREE.MeshBasicMaterial({ color: 0xfacc15 })
+                // Glowing Chest Energy Core
+                const chestCore = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.14, 12, 12),
+                    new THREE.MeshBasicMaterial({ color: 0xfef08a })
                 );
-                headband.position.y = 2.72;
-                this.root.add(headband);
+                chestCore.position.set(0, 0.85, 0.24);
+                this.bodyPivot.add(chestCore);
 
-                // Limbs
-                this.leftLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.09, 1.0, 10), darkMat);
-                this.leftLeg.position.set(-0.16, 0.5, 0);
-                this.rightLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.09, 1.0, 10), darkMat);
-                this.rightLeg.position.set(0.16, 0.5, 0);
-                this.root.add(this.leftLeg, this.rightLeg);
+                // Head Group
+                this.headGroup = new THREE.Group();
+                this.headGroup.position.y = 1.72;
+                this.bodyPivot.add(this.headGroup);
 
-                this.leftArm = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.08, 0.9, 10), this.skinMat);
-                this.leftArm.position.set(-0.36, 1.85, 0);
-                this.root.add(this.leftArm);
+                this.head = new THREE.Mesh(new THREE.SphereGeometry(0.46, 22, 22), this.skinMat);
+                this.head.castShadow = true;
+                this.headGroup.add(this.head);
 
+                // Glowing Fierce Eyes
+                const eyeGeo = new THREE.BoxGeometry(0.16, 0.07, 0.1);
+                const eyeL = new THREE.Mesh(eyeGeo, this.glowMat);
+                eyeL.position.set(-0.15, 0.06, 0.41);
+                eyeL.rotation.z = -0.15;
+                const eyeR = new THREE.Mesh(eyeGeo, this.glowMat);
+                eyeR.position.set(0.15, 0.06, 0.41);
+                eyeR.rotation.z = 0.15;
+                this.headGroup.add(eyeL, eyeR);
+
+                // Ninja Hero Headband + Flowing Ribbon Tails
+                const bandMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, emissive: 0xf59e0b, emissiveIntensity: 0.3 });
+                const headband = new THREE.Mesh(new THREE.CylinderGeometry(0.47, 0.47, 0.15, 20), bandMat);
+                headband.position.y = 0.14;
+                this.headGroup.add(headband);
+
+                this.ribbonPivot = new THREE.Group();
+                this.ribbonPivot.position.set(0, 0.14, -0.45);
+                this.headGroup.add(this.ribbonPivot);
+
+                this.tailL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.06, 0.75), bandMat);
+                this.tailL.position.set(-0.12, -0.05, -0.35);
+                this.tailR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.06, 0.65), bandMat);
+                this.tailR.position.set(0.12, -0.08, -0.30);
+                this.ribbonPivot.add(this.tailL, this.tailR);
+
+                // Left Arm (Shoulder + Forearm + Hand)
+                this.leftArmPivot = new THREE.Group();
+                this.leftArmPivot.position.set(-0.42, 1.25, 0);
+                this.bodyPivot.add(this.leftArmPivot);
+                const lShoulder = new THREE.Mesh(new THREE.SphereGeometry(0.15, 12, 12), this.skinMat);
+                const lArm = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.095, 0.92, 12), this.skinMat);
+                lArm.position.set(0, -0.42, 0.12);
+                lArm.rotation.x = 0.35;
+                const lHand = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 12), this.limbMat);
+                lHand.position.set(0, -0.82, 0.28);
+                this.leftArmPivot.add(lShoulder, lArm, lHand);
+
+                // Right Arm (Weapon Arm with Joint)
                 this.rightArmPivot = new THREE.Group();
-                this.rightArmPivot.position.set(0.36, 2.15, 0);
-                this.root.add(this.rightArmPivot);
-
-                this.rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.08, 0.9, 10), this.skinMat);
-                this.rightArm.position.set(0, -0.35, 0.25);
-                this.rightArm.rotation.x = Math.PI / 2.4;
-                this.rightArmPivot.add(this.rightArm);
+                this.rightArmPivot.position.set(0.42, 1.25, 0);
+                this.bodyPivot.add(this.rightArmPivot);
+                const rShoulder = new THREE.Mesh(new THREE.SphereGeometry(0.15, 12, 12), this.skinMat);
+                this.rightArm = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.095, 0.92, 12), this.skinMat);
+                this.rightArm.position.set(0, -0.34, 0.28);
+                this.rightArm.rotation.x = Math.PI / 2.3;
+                const rHand = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 12), this.limbMat);
+                rHand.position.set(0, -0.45, 0.68);
+                this.rightArmPivot.add(rShoulder, this.rightArm, rHand);
 
                 this.weaponHolder = new THREE.Group();
-                this.weaponHolder.position.set(0, -0.35, 0.72);
+                this.weaponHolder.position.set(0, -0.45, 0.72);
                 this.rightArmPivot.add(this.weaponHolder);
+
+                // Articulated Legs (Left & Right)
+                this.leftLegPivot = new THREE.Group();
+                this.leftLegPivot.position.set(-0.19, 1.05, 0);
+                this.root.add(this.leftLegPivot);
+                const lLegMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.10, 1.05, 12), this.limbMat);
+                lLegMesh.position.y = -0.52;
+                const lFoot = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.14, 0.38), this.skinMat);
+                lFoot.position.set(0, -1.0, 0.08);
+                this.leftLegPivot.add(lLegMesh, lFoot);
+
+                this.rightLegPivot = new THREE.Group();
+                this.rightLegPivot.position.set(0.19, 1.05, 0);
+                this.root.add(this.rightLegPivot);
+                const rLegMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.10, 1.05, 12), this.limbMat);
+                rLegMesh.position.y = -0.52;
+                const rFoot = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.14, 0.38), this.skinMat);
+                rFoot.position.set(0, -1.0, 0.08);
+                this.rightLegPivot.add(rLegMesh, rFoot);
 
                 // Mecha Robot Armor Suit Group (Visible when weaponId === 'robot')
                 this.mechaGroup = new THREE.Group();
-                const mechaArmorMat = new THREE.MeshStandardMaterial({ color: skin.hex, metalness: 0.75, roughness: 0.2 });
+                const mechaArmorMat = new THREE.MeshStandardMaterial({ color: skin.hex, metalness: 0.8, roughness: 0.18 });
                 const coreMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
-                const chest = new THREE.Mesh(new THREE.BoxGeometry(1.15, 1.35, 0.85), mechaArmorMat);
-                chest.position.y = 1.75;
-                const core = new THREE.Mesh(new THREE.SphereGeometry(0.24, 12, 12), coreMat);
-                core.position.set(0, 1.8, 0.45);
-                const sL = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.55, 0.65), mechaArmorMat);
-                sL.position.set(-0.8, 2.35, 0);
-                const sR = sL.clone(); sR.position.x = 0.8;
-                const visor = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.26, 0.6), coreMat);
-                visor.position.set(0, 2.7, 0.22);
+                const chest = new THREE.Mesh(new THREE.BoxGeometry(1.25, 1.4, 0.92), mechaArmorMat);
+                chest.position.y = 0.75;
+                const core = new THREE.Mesh(new THREE.SphereGeometry(0.26, 16, 16), coreMat);
+                core.position.set(0, 0.85, 0.48);
+                const sL = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.6, 0.75), mechaArmorMat);
+                sL.position.set(-0.88, 1.35, 0);
+                const sR = sL.clone(); sR.position.x = 0.88;
+                const visor = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.28, 0.65), coreMat);
+                visor.position.set(0, 1.75, 0.25);
                 this.mechaGroup.add(chest, core, sL, sR, visor);
                 this.mechaGroup.visible = false;
-                this.root.add(this.mechaGroup);
+                this.bodyPivot.add(this.mechaGroup);
 
                 this.equipWeapon(this.weaponId);
+                this.updateScale();
+            }
+
+            updateScale() {
+                // Larger base scale (1.55x) so Stickmen look heroic, detailed, and prominent!
+                const base = gameState.modeId === 'GIANT' ? 2.25 : (this.weaponId === 'robot' ? 1.82 : 1.55);
+                this.root.scale.set(base, base, base);
             }
 
             setSkin(colorId) {
                 this.colorId = colorId;
-                this.buildBody();
+                this.buildArticulatedBody();
             }
 
             equipWeapon(weaponId) {
@@ -738,26 +952,15 @@
                 while (this.weaponHolder.children.length > 0) this.weaponHolder.remove(this.weaponHolder.children[0]);
                 const spec = WEAPON_SPECS[weaponId] || WEAPON_SPECS.katana;
                 this.mechaGroup.visible = (weaponId === 'robot');
+                const weaponMesh = buildDetailed3DWeaponMesh(weaponId, spec);
+                this.weaponHolder.add(weaponMesh);
+                this.updateScale();
+            }
 
-                if (weaponId === 'unarmed') return;
-
-                const mat = new THREE.MeshStandardMaterial({ color: spec.hex, emissive: spec.hex, emissiveIntensity: 0.45, metalness: 0.6, roughness: 0.2 });
-                if (['katana', 'lasersword', 'scythe', 'lightspear', 'chainsaw'].includes(weaponId)) {
-                    const blade = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.14, 1.75), mat);
-                    blade.position.z = 0.75;
-                    this.weaponHolder.add(blade);
-                } else if (['thorhammer', 'gravityhammer'].includes(weaponId)) {
-                    const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.2), new THREE.MeshStandardMaterial({ color: 0x78350f }));
-                    handle.rotation.x = Math.PI / 2;
-                    handle.position.z = 0.45;
-                    const head = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.55, 0.85), mat);
-                    head.position.z = 1.0;
-                    this.weaponHolder.add(handle, head);
-                } else {
-                    const barrel = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.26, 1.05), mat);
-                    barrel.position.z = 0.4;
-                    this.weaponHolder.add(barrel);
-                }
+            triggerHitFlash() {
+                this.hitFlashTimer = 0.14;
+                this.skinMat.emissive.setHex(0xffffff);
+                this.skinMat.emissiveIntensity = 0.95;
             }
 
             resetForRound() {
@@ -772,76 +975,159 @@
                 this.vx = 0; this.vz = 0; this.vy = 0;
                 this.root.position.set(this.spawnX, 0, 0);
                 this.root.rotation.y = this.facingAngle;
-                const scale = gameState.modeId === 'GIANT' ? 1.55 : (this.weaponId === 'robot' ? 1.25 : 1.0);
-                this.root.scale.set(scale, scale, scale);
+                this.targetAngle = this.facingAngle;
+                this.netTargetPos.set(this.spawnX, 0, 0);
+                this.netTargetVel.set(0, 0, 0);
+                this.netTargetAngle = this.facingAngle;
+                this.updateScale();
             }
         }
 
-        const p1 = new StickmanFighter('p1', -18, Math.PI / 2);
-        const p2 = new StickmanFighter('p2',  18, -Math.PI / 2);
+        const p1 = new StickmanFighter('p1', -15, Math.PI / 2);
+        const p2 = new StickmanFighter('p2',  15, -Math.PI / 2);
 
-        // ============================================================================
-        // 6. PROJECTILES, AIRDROPS, EXPLOSIONS & FX ARRAYS
-        // ============================================================================
         let projectiles = [];
         let airdrops = [];
         let visualFx = [];
+        let particles = [];
+        let bomberPlanes = [];
 
-        function spawnDamagePopup(worldPos, text, colorCss = '#facc15') {
-            const v = worldPos.clone();
-            v.y += 3.1;
-            v.project(camera);
-            const x = (v.x * 0.5 + 0.5) * window.innerWidth;
-            const y = (-v.y * 0.5 + 0.5) * window.innerHeight;
-            const el = document.createElement('div');
-            el.className = 'damage-popup text-base md:text-lg';
-            el.style.left = `${x}px`;
-            el.style.top = `${y}px`;
-            el.style.color = colorCss;
-            el.textContent = text;
-            document.getElementById('fx-layer').appendChild(el);
-            setTimeout(() => el.remove(), 850);
+        const sharedParticleGeo = new THREE.SphereGeometry(0.18, 6, 6);
+
+        function spawnParticles(pos, count, colorHex, speed = 8, size = 1.0, life = 0.45, gravity = 16) {
+            for (let i = 0; i < count; i++) {
+                const mat = new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 1 });
+                const mesh = new THREE.Mesh(sharedParticleGeo, mat);
+                mesh.position.copy(pos);
+                mesh.scale.setScalar(size * (0.6 + Math.random() * 0.7));
+                const angle = Math.random() * Math.PI * 2;
+                const up = (Math.random() * 0.8 + 0.2) * speed;
+                const horiz = Math.random() * speed;
+                const vel = new THREE.Vector3(Math.cos(angle) * horiz, up, Math.sin(angle) * horiz);
+                scene.add(mesh);
+                particles.push({ mesh, vel, life, maxLife: life, gravity });
+            }
+        }
+
+        function createSlashArcFX(fighter, colorHex, range = 5.0) {
+            const arcGeo = new THREE.RingGeometry(range * 0.35, range * 0.65, 24, 1, -Math.PI * 0.42, Math.PI * 0.84);
+            const mat = new THREE.MeshBasicMaterial({
+                color: colorHex, side: THREE.DoubleSide, transparent: true, opacity: 0.92
+            });
+            const mesh = new THREE.Mesh(arcGeo, mat);
+            mesh.position.copy(fighter.root.position).add(new THREE.Vector3(0, 2.2, 0));
+            mesh.rotation.order = 'YXZ';
+            mesh.rotation.y = fighter.root.rotation.y - Math.PI / 2;
+            mesh.rotation.x = Math.PI / 2 + (Math.random() - 0.5) * 0.25;
+            scene.add(mesh);
+            visualFx.push({ mesh, life: 0.22, maxLife: 0.22, maxRadius: 1.45, isSlash: true });
         }
 
         function createExplosionFX(pos, radius, colorHex) {
-            playTone(95, 'sawtooth', 0.32, 0.2);
+            playSound(90, 'sawtooth', 0.38, 0.22, 28);
+            addScreenShake(Math.min(1.4, radius * 0.14));
+
+            // Core Blast Sphere
             const sphere = new THREE.Mesh(
-                new THREE.SphereGeometry(1, 18, 18),
-                new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.85 })
+                new THREE.SphereGeometry(1, 20, 20),
+                new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.88 })
             );
             sphere.position.copy(pos);
             scene.add(sphere);
-            visualFx.push({ mesh: sphere, life: 0.35, maxLife: 0.35, maxRadius: radius });
+            visualFx.push({ mesh: sphere, life: 0.36, maxLife: 0.36, maxRadius: radius });
+
+            // Ground Shockwave Ring
+            const ring = new THREE.Mesh(
+                new THREE.RingGeometry(0.6, 1.25, 32),
+                new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.9 })
+            );
+            ring.rotation.x = -Math.PI / 2;
+            ring.position.set(pos.x, 0.12, pos.z);
+            scene.add(ring);
+            visualFx.push({ mesh: ring, life: 0.42, maxLife: 0.42, maxRadius: radius * 1.25 });
+
+            // Burst Sparks
+            spawnParticles(pos, 18, colorHex, 14, 1.3, 0.55, 22);
+            spawnParticles(pos, 8, 0xfef08a, 18, 0.9, 0.4, 15);
         }
 
         function createBeamFX(startPos, endPos, colorHex) {
             const dist = startPos.distanceTo(endPos);
             const mid = startPos.clone().add(endPos).multiplyScalar(0.5);
-            const geo = new THREE.CylinderGeometry(0.28, 0.28, dist, 12);
+            const geo = new THREE.CylinderGeometry(0.36, 0.36, dist, 14);
             geo.rotateX(Math.PI / 2);
-            const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.9 }));
+            const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: colorHex, transparent: true, opacity: 0.95 }));
             mesh.position.copy(mid);
             mesh.lookAt(endPos);
             scene.add(mesh);
-            visualFx.push({ mesh, life: 0.22, maxLife: 0.22, maxRadius: 1 });
+            visualFx.push({ mesh, life: 0.25, maxLife: 0.25, maxRadius: 1 });
+            spawnParticles(endPos, 12, colorHex, 10, 1.1, 0.35, 10);
+        }
+
+        function spawnBomberJetFX(targetPos) {
+            const jetGroup = new THREE.Group();
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.7, roughness: 0.3 });
+            const wingMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.6, roughness: 0.4 });
+            const glowMat = new THREE.MeshBasicMaterial({ color: 0xf97316 });
+
+            const fuselage = new THREE.Mesh(new THREE.ConeGeometry(0.9, 7.5, 12), bodyMat);
+            fuselage.rotation.x = Math.PI / 2;
+            const wings = new THREE.Mesh(new THREE.BoxGeometry(8.5, 0.18, 2.2), wingMat);
+            wings.position.z = -0.5;
+            const thruster = new THREE.Mesh(new THREE.SphereGeometry(0.55, 10, 10), glowMat);
+            thruster.position.z = -3.8;
+            jetGroup.add(fuselage, wings, thruster);
+
+            jetGroup.position.set(targetPos.x - 38, 22, targetPos.z);
+            jetGroup.rotation.y = Math.PI / 2;
+            scene.add(jetGroup);
+
+            // Target Warning Ring on Ground
+            const targetRing = new THREE.Mesh(
+                new THREE.RingGeometry(3.2, 3.8, 32),
+                new THREE.MeshBasicMaterial({ color: 0xef4444, side: THREE.DoubleSide, transparent: true, opacity: 0.85 })
+            );
+            targetRing.rotation.x = -Math.PI / 2;
+            targetRing.position.set(targetPos.x, 0.08, targetPos.z);
+            scene.add(targetRing);
+            visualFx.push({ mesh: targetRing, life: 1.1, maxLife: 1.1, maxRadius: 1.2 });
+
+            bomberPlanes.push({ mesh: jetGroup, life: 1.4 });
+        }
+
+        function spawnDamagePopup(worldPos, text, colorCss = '#facc15') {
+            const v = worldPos.clone();
+            v.y += 4.2;
+            v.project(camera);
+            const x = (v.x * 0.5 + 0.5) * window.innerWidth;
+            const y = (-v.y * 0.5 + 0.5) * window.innerHeight;
+            const el = document.createElement('div');
+            el.className = 'damage-popup text-base md:text-xl';
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            el.style.color = colorCss;
+            el.textContent = text;
+            document.getElementById('fx-layer').appendChild(el);
+            setTimeout(() => el.remove(), 920);
         }
 
         function spawnAirdropCrate(customX, customZ, customWep) {
-            const x = customX !== undefined ? customX : (Math.random() - 0.5) * 32;
+            const x = customX !== undefined ? customX : (Math.random() - 0.5) * 34;
             const z = customZ !== undefined ? customZ : (Math.random() - 0.5) * 20;
             const wepId = customWep || WEAPON_KEYS[Math.floor(Math.random() * WEAPON_KEYS.length)];
 
             const group = new THREE.Group();
-            group.position.set(x, 22, z);
+            group.position.set(x, 24, z);
             const box = new THREE.Mesh(
-                new THREE.BoxGeometry(1.7, 1.7, 1.7),
-                new THREE.MeshStandardMaterial({ color: 0xf59e0b, roughness: 0.3, metalness: 0.4 })
+                new THREE.BoxGeometry(2.1, 2.1, 2.1),
+                new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xd97706, emissiveIntensity: 0.25, roughness: 0.3, metalness: 0.5 })
             );
+            box.castShadow = true;
             const chute = new THREE.Mesh(
-                new THREE.SphereGeometry(1.6, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2),
+                new THREE.SphereGeometry(2.1, 14, 10, 0, Math.PI * 2, 0, Math.PI / 2),
                 new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true })
             );
-            chute.position.y = 2.1;
+            chute.position.y = 2.6;
             group.add(box, chute);
             scene.add(group);
             airdrops.push({ mesh: group, chute, weaponId: wepId });
@@ -851,68 +1137,74 @@
             }
         }
 
-        // ============================================================================
-        // 7. PERFORM ATTACK FOR ALL 26 WEAPONS
-        // ============================================================================
-        function triggerFighterAttack(attacker, defender) {
+        function triggerFighterAttack(attacker, defender, isRemoteReplay = false) {
             const spec = WEAPON_SPECS[attacker.weaponId] || WEAPON_SPECS.katana;
             const cdMult = gameState.modeId === 'HYPERSPEED' ? 0.5 : 1.0;
             attacker.maxCooldown = spec.cd * cdMult;
             attacker.cooldown = attacker.maxCooldown;
-            attacker.swingTimer = 0.24;
+            attacker.swingTimer = 0.28;
 
             const dir = new THREE.Vector3(Math.sin(attacker.root.rotation.y), 0, Math.cos(attacker.root.rotation.y)).normalize();
-            const startPos = attacker.root.position.clone().add(new THREE.Vector3(0, 1.7, 0)).add(dir.clone().multiplyScalar(1.1));
+            const startPos = attacker.root.position.clone().add(new THREE.Vector3(0, 2.3, 0)).add(dir.clone().multiplyScalar(1.5));
 
-            playTone(spec.type === 'melee' ? 320 : 520, 'triangle', 0.14, 0.14);
+            playSound(spec.type === 'melee' ? 340 : 540, 'triangle', 0.16, 0.16, 140);
 
-            if (gameState.isOnline && gameState.networkRole === 'HOST' && conn && conn.open) {
+            if (!isRemoteReplay && gameState.isOnline && conn && conn.open) {
                 conn.send({ type: 'ATTACK_FX', id: attacker.id, weaponId: attacker.weaponId });
             }
 
             if (['melee', 'scythe', 'thor', 'gravity'].includes(spec.type)) {
-                attacker.vx += dir.x * 8;
-                attacker.vz += dir.z * 8;
-                createExplosionFX(startPos, spec.range * 0.55, spec.hex);
+                attacker.vx += dir.x * 10;
+                attacker.vz += dir.z * 10;
+                createSlashArcFX(attacker, spec.hex, spec.range);
+                spawnParticles(startPos, 10, spec.hex, 10, 1.0, 0.35, 12);
 
                 if (spec.type === 'thor') {
-                    const skyPos = defender.root.position.clone().add(new THREE.Vector3(0, 14, 0));
+                    const skyPos = defender.root.position.clone().add(new THREE.Vector3(0, 18, 0));
                     createBeamFX(skyPos, defender.root.position.clone(), 0x60a5fa);
+                    createExplosionFX(defender.root.position.clone(), 4.5, 0x60a5fa);
                 }
 
-                const dist = attacker.root.position.distanceTo(defender.root.position);
-                if (dist <= spec.range + 0.8) {
-                    applyDamage(attacker, defender, spec.dmg, dir, spec.kb);
-                    if (spec.heal) {
-                        attacker.hp = Math.min(attacker.maxHp, attacker.hp + spec.heal);
-                        spawnDamagePopup(attacker.root.position, `+${spec.heal} HP Hút Máu`, '#4ade80');
-                    }
-                    if (spec.type === 'gravity') {
-                        defender.vy = 16;
-                        spawnDamagePopup(defender.root.position, 'HẤT TUNG!', '#818cf8');
+                if (!gameState.isOnline || gameState.networkRole === 'HOST') {
+                    const dist = attacker.root.position.distanceTo(defender.root.position);
+                    if (dist <= spec.range + 1.1) {
+                        applyDamage(attacker, defender, spec.dmg, dir, spec.kb);
+                        if (spec.heal) {
+                            attacker.hp = Math.min(attacker.maxHp, attacker.hp + spec.heal);
+                            spawnDamagePopup(attacker.root.position, `+${spec.heal} HP Hút Máu`, '#4ade80');
+                        }
+                        if (spec.type === 'gravity') {
+                            defender.vy = 18;
+                            spawnDamagePopup(defender.root.position, '🚀 HẤT TUNG!', '#818cf8');
+                        }
                     }
                 }
             } else if (spec.type === 'beam') {
                 const endPos = startPos.clone().add(dir.clone().multiplyScalar(spec.range));
                 createBeamFX(startPos, endPos, spec.hex);
-                const toDef = defender.root.position.clone().sub(attacker.root.position);
-                const proj = toDef.dot(dir);
-                if (proj > 0 && proj <= spec.range) {
-                    const perp = toDef.sub(dir.clone().multiplyScalar(proj)).length();
-                    if (perp < 2.2) applyDamage(attacker, defender, spec.dmg, dir, spec.kb);
+                addScreenShake(0.45);
+                if (!gameState.isOnline || gameState.networkRole === 'HOST') {
+                    const toDef = defender.root.position.clone().sub(attacker.root.position);
+                    const proj = toDef.dot(dir);
+                    if (proj > 0 && proj <= spec.range) {
+                        const perp = toDef.sub(dir.clone().multiplyScalar(proj)).length();
+                        if (perp < 2.6) applyDamage(attacker, defender, spec.dmg, dir, spec.kb);
+                    }
                 }
             } else if (spec.type === 'airstrike' || spec.type === 'meteor') {
                 const targetPos = defender.root.position.clone();
-                spawnDamagePopup(targetPos, spec.type === 'airstrike' ? 'MÁY BAY THẢ BOM!' : 'THIÊN THẠCH RƠI!', '#f43f5e');
+                if (spec.type === 'airstrike') spawnBomberJetFX(targetPos);
+                spawnDamagePopup(targetPos, spec.type === 'airstrike' ? '✈️ MÁY BAY RẢI BOM!' : '☄️ THIÊN THẠCH RƠI!', '#f43f5e');
                 const count = spec.type === 'airstrike' ? 5 : 1;
                 for (let i = 0; i < count; i++) {
-                    const offset = count === 1 ? new THREE.Vector3(0, 0, 0) : new THREE.Vector3((i - 2) * 2.4, 0, (Math.random() - 0.5) * 2.5);
+                    const offset = count === 1 ? new THREE.Vector3(0, 0, 0) : new THREE.Vector3((i - 2) * 2.5, 0, (Math.random() - 0.5) * 2.2);
                     const dropPos = targetPos.clone().add(offset);
-                    dropPos.y = 20 + i * 2.5;
-                    spawnProjectile(attacker, dropPos, new THREE.Vector3(0, -24, 0), spec, 'meteor_drop');
+                    dropPos.y = 22 + i * 2.8;
+                    spawnProjectile(attacker, dropPos, new THREE.Vector3(0, -26, 0), spec, 'meteor_drop');
                 }
             } else if (spec.type === 'shotgun' || spec.type === 'shuriken') {
                 const count = spec.pellets || 5;
+                spawnParticles(startPos, 8, spec.hex, 9, 0.8, 0.25, 8);
                 for (let i = 0; i < count; i++) {
                     const angleOffset = (i - (count - 1) / 2) * 0.13;
                     const pDir = dir.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), angleOffset);
@@ -920,33 +1212,38 @@
                 }
             } else if (spec.type === 'drones') {
                 for (let i = -1; i <= 1; i++) {
-                    const sPos = startPos.clone().add(new THREE.Vector3(i * 1.2, 0.8, 0));
+                    const sPos = startPos.clone().add(new THREE.Vector3(i * 1.4, 1.0, 0));
                     spawnProjectile(attacker, sPos, dir.clone().multiplyScalar(spec.bSpeed), spec, 'drone');
                 }
             } else if (spec.type === 'robot') {
-                createExplosionFX(startPos, 3.2, 0xa855f7);
-                if (attacker.root.position.distanceTo(defender.root.position) <= spec.range) {
-                    applyDamage(attacker, defender, spec.dmg, dir, spec.kb);
+                createSlashArcFX(attacker, 0xa855f7, spec.range);
+                createExplosionFX(startPos, 3.6, 0xa855f7);
+                if (!gameState.isOnline || gameState.networkRole === 'HOST') {
+                    if (attacker.root.position.distanceTo(defender.root.position) <= spec.range) {
+                        applyDamage(attacker, defender, spec.dmg, dir, spec.kb);
+                    }
                 }
                 spawnProjectile(attacker, startPos, dir.clone().multiplyScalar(spec.bSpeed), spec, 'rocket');
             } else {
-                const vel = dir.clone().multiplyScalar(spec.bSpeed || 28);
-                if (spec.type === 'lob') vel.y = 11.5;
+                spawnParticles(startPos, 6, spec.hex, 8, 0.8, 0.22, 6);
+                const vel = dir.clone().multiplyScalar(spec.bSpeed || 32);
+                if (spec.type === 'lob') vel.y = 12.5;
                 spawnProjectile(attacker, startPos, vel, spec, spec.type);
             }
         }
 
         function spawnProjectile(owner, pos, vel, spec, kind) {
+            const isBig = ['rocket', 'meteor_drop', 'blackhole'].includes(kind);
             const mesh = new THREE.Mesh(
-                new THREE.SphereGeometry(kind === 'rocket' || kind === 'meteor_drop' || kind === 'blackhole' ? 0.52 : 0.28, 12, 12),
+                new THREE.SphereGeometry(isBig ? 0.62 : 0.34, 14, 14),
                 new THREE.MeshBasicMaterial({ color: spec.hex })
             );
             mesh.position.copy(pos);
             scene.add(mesh);
             projectiles.push({
                 owner, mesh, vel: vel.clone(), spec, kind,
-                life: kind === 'boomerang' ? 1.8 : 2.6,
-                age: 0
+                life: kind === 'boomerang' ? 1.85 : 2.6,
+                age: 0, trailTick: 0
             });
         }
 
@@ -954,18 +1251,22 @@
             if (!gameState.inBattle) return;
             const dmg = Math.max(1, Math.round(amount));
             defender.hp = Math.max(0, defender.hp - dmg);
+            defender.triggerHitFlash();
+            spawnParticles(defender.root.position.clone().add(new THREE.Vector3(0, 2.2, 0)), 14, 0xfacc15, 11, 1.1, 0.4, 18);
+            addScreenShake(0.35);
+
             if (defender.isHealing) {
                 defender.isHealing = false;
                 defender.healRing.visible = false;
-                spawnDamagePopup(defender.root.position, 'HỦY HỒI MÁU!', '#fb7185');
+                spawnDamagePopup(defender.root.position, '💔 HỦY HỒI MÁU!', '#fb7185');
             }
             defender.vx += dir.x * knockback;
             defender.vz += dir.z * knockback;
             spawnDamagePopup(defender.root.position, `-${dmg} HP`, '#facc15');
-            playTone(150, 'square', 0.15, 0.16);
+            playSound(140, 'square', 0.16, 0.18, 55);
 
             if (gameState.isOnline && gameState.networkRole === 'HOST' && conn && conn.open) {
-                conn.send({ type: 'POPUP', target: defender.id, text: `-${dmg} HP`, color: '#facc15' });
+                conn.send({ type: 'POPUP', target: defender.id, text: `-${dmg} HP`, color: '#facc15', flash: true });
             }
 
             if (defender.hp <= 0) {
@@ -973,9 +1274,6 @@
             }
         }
 
-        // ============================================================================
-        // 8. KEYBOARD & ON-SCREEN CLICK INPUT
-        // ============================================================================
         const keys = {};
         window.addEventListener('keydown', e => {
             const k = e.key.toLowerCase();
@@ -990,7 +1288,6 @@
             if (badge) badge.classList.remove('active-key');
         });
 
-        // Allow clicking/touching the key badges at the bottom bar
         document.querySelectorAll('[data-key]').forEach(el => {
             const k = el.getAttribute('data-key');
             const press = (ev) => { ev.preventDefault(); keys[k] = true; el.classList.add('active-key'); };
@@ -1031,9 +1328,6 @@
             return { moveX: mx, moveZ: mz, attack: atk, heal: heal };
         }
 
-        // ============================================================================
-        // 9. ONLINE PEERJS WEBRTC P2P CONNECTION MANAGER (WITH GOOGLE STUN)
-        // ============================================================================
         const PEER_PREFIX = 'stickman3d-vn-room-';
         const PEER_CONFIG = {
             config: {
@@ -1047,7 +1341,7 @@
 
         function initHostRoom() {
             if (typeof Peer === 'undefined') {
-                document.getElementById('online-conn-msg').textContent = 'Không thể tải thư viện mạng PeerJS. Bạn vẫn có thể chơi 2 Người 1 Máy!';
+                document.getElementById('online-conn-msg').textContent = 'Không thể tải thư viện PeerJS. Bạn vẫn có thể chơi 2 Người 1 Máy!';
                 return;
             }
             try {
@@ -1057,11 +1351,11 @@
                 gameState.networkRole = 'HOST';
                 gameState.isOnline = true;
                 document.getElementById('host-room-code').textContent = code;
-                document.getElementById('online-conn-msg').textContent = `Đang mở phòng [${code}]... Hãy gửi mã này cho Người chơi 2!`;
+                document.getElementById('online-conn-msg').textContent = `Đang mở phòng [${code}]... Hãy gửi mã hoặc Link Mời cho Người chơi 2!`;
 
                 peer = new Peer(PEER_PREFIX + code, PEER_CONFIG);
                 peer.on('open', () => {
-                    document.getElementById('online-conn-msg').textContent = `Phòng [${code}] đã sẵn sàng! Đang chờ Người chơi 2 nhập mã...`;
+                    document.getElementById('online-conn-msg').textContent = `Phòng [${code}] đã sẵn sàng! Đang chờ Người chơi 2 kết nối...`;
                 });
                 peer.on('connection', c => {
                     conn = c;
@@ -1070,9 +1364,7 @@
                 peer.on('error', err => {
                     document.getElementById('online-conn-msg').textContent = `Lỗi mạng P2P (${err.type}). Hãy bấm Tạo Mã Mới!`;
                 });
-            } catch (e) {
-                document.getElementById('online-conn-msg').textContent = 'Trình duyệt chặn kết nối P2P. Hãy mở trên tab trình duyệt hoặc GitHub Pages.';
-            }
+            } catch (e) {}
         }
 
         function joinHostRoom(code) {
@@ -1091,15 +1383,16 @@
                     setupPeerConnection();
                 });
                 peer.on('error', err => {
-                    document.getElementById('online-conn-msg').textContent = `Không tìm thấy phòng [${code}] hoặc lỗi kết nối (${err.type}).`;
+                    document.getElementById('online-conn-msg').textContent = `Không tìm thấy phòng [${code}] (${err.type}).`;
                 });
             } catch (e) {}
         }
 
         function setupPeerConnection() {
             conn.on('open', () => {
-                document.getElementById('online-conn-msg').innerHTML = `<b class="text-emerald-400">ĐÃ KẾT NỐI 2 NGƯỜI CHƠI (Phòng ${gameState.roomCode})!</b> Chủ phòng có thể bấm VÀO ĐẤU TRƯỜNG NGAY!`;
+                document.getElementById('online-conn-msg').innerHTML = `<b class="text-emerald-400">✅ ĐÃ KẾT NỐI 2 NGƯỜI CHƠI (Phòng ${gameState.roomCode})!</b> Chủ phòng có thể bấm VÀO ĐẤU TRƯỜNG NGAY!`;
                 document.getElementById('hud-online-ping').classList.remove('hidden');
+                playSound(640, 'sine', 0.25, 0.18, 880);
                 sendLobbyConfigSync();
             });
 
@@ -1134,17 +1427,24 @@
                     startBattleMatch(true);
                 } else if (data.type === 'CLIENT_INPUT') {
                     remoteInput = data.input;
+                    if (remoteInput.attack && p2.cooldown <= 0 && !p2.isHealing) {
+                        triggerFighterAttack(p2, p1, true);
+                    }
                 } else if (data.type === 'STATE_SNAP' && gameState.networkRole === 'CLIENT') {
                     applyHostSnapshot(data);
-                } else if (data.type === 'ATTACK_FX' && gameState.networkRole === 'CLIENT') {
+                } else if (data.type === 'ATTACK_FX') {
                     const f = data.id === 'p1' ? p1 : p2;
                     const d = data.id === 'p1' ? p2 : p1;
                     if (f.weaponId !== data.weaponId) f.equipWeapon(data.weaponId);
-                    triggerFighterAttack(f, d);
+                    triggerFighterAttack(f, d, true);
                 } else if (data.type === 'SPAWN_AIRDROP' && gameState.networkRole === 'CLIENT') {
                     spawnAirdropCrate(data.x, data.z, data.wepId);
                 } else if (data.type === 'POPUP' && gameState.networkRole === 'CLIENT') {
                     const target = data.target === 'p1' ? p1 : p2;
+                    if (data.flash) {
+                        target.triggerHitFlash();
+                        spawnParticles(target.root.position.clone().add(new THREE.Vector3(0, 2.2, 0)), 12, 0xfacc15, 10, 1.0, 0.35, 16);
+                    }
                     spawnDamagePopup(target.root.position, data.text, data.color);
                 } else if (data.type === 'ROUND_OVER' && gameState.networkRole === 'CLIENT') {
                     gameState.scores = data.scores;
@@ -1171,25 +1471,85 @@
         }
 
         function applyHostSnapshot(snap) {
-            p1.root.position.set(snap.p1.x, snap.p1.y, snap.p1.z);
-            p1.root.rotation.y = snap.p1.ry;
+            p1.netTargetPos.set(snap.p1.x, snap.p1.y, snap.p1.z);
+            p1.netTargetVel.set(snap.p1.vx || 0, 0, snap.p1.vz || 0);
+            p1.netTargetAngle = snap.p1.ry;
             p1.hp = snap.p1.hp; p1.potions = snap.p1.pot;
             p1.isHealing = snap.p1.heal; p1.healTimer = snap.p1.ht;
+            p1.healRing.visible = snap.p1.heal;
             if (p1.weaponId !== snap.p1.wep) p1.equipWeapon(snap.p1.wep);
 
-            p2.root.position.set(snap.p2.x, snap.p2.y, snap.p2.z);
-            p2.root.rotation.y = snap.p2.ry;
+            p2.netTargetPos.set(snap.p2.x, snap.p2.y, snap.p2.z);
+            p2.netTargetVel.set(snap.p2.vx || 0, 0, snap.p2.vz || 0);
+            p2.netTargetAngle = snap.p2.ry;
             p2.hp = snap.p2.hp; p2.potions = snap.p2.pot;
             p2.isHealing = snap.p2.heal; p2.healTimer = snap.p2.ht;
+            p2.healRing.visible = snap.p2.heal;
             if (p2.weaponId !== snap.p2.wep) p2.equipWeapon(snap.p2.wep);
 
             gameState.airdropTimer = snap.airdropTimer;
-            updateHUD();
         }
 
-        // ============================================================================
-        // 10. CORE PHYSICS, HEALING (2s STAND STILL), PROJECTILES & GAME LOOP
-        // ============================================================================
+        function animateStickmanJoints(f, isMoving, dt) {
+            f.idleTime += dt;
+
+            // Hit flash recovery
+            if (f.hitFlashTimer > 0) {
+                f.hitFlashTimer -= dt;
+                if (f.hitFlashTimer <= 0) {
+                    const skin = SKIN_COLORS.find(s => s.id === f.colorId) || SKIN_COLORS[0];
+                    f.skinMat.emissive.setHex(skin.hex);
+                    f.skinMat.emissiveIntensity = 0.14;
+                }
+            }
+
+            // Headband ribbons waving in wind
+            const waveSpeed = isMoving ? 15 : 5;
+            f.tailL.rotation.x = Math.sin(f.idleTime * waveSpeed) * 0.35 + (isMoving ? 0.45 : 0.15);
+            f.tailR.rotation.x = Math.cos(f.idleTime * waveSpeed) * 0.35 + (isMoving ? 0.45 : 0.15);
+            f.auraRing.rotation.z += dt * 1.4;
+
+            if (isMoving && !f.isHealing) {
+                f.walkCycle += dt * 15.5;
+                const swing = Math.sin(f.walkCycle);
+                f.leftLegPivot.rotation.x = swing * 0.78;
+                f.rightLegPivot.rotation.x = -swing * 0.78;
+                f.leftArmPivot.rotation.x = -swing * 0.55;
+                f.bodyPivot.position.y = 1.1 + Math.abs(Math.sin(f.walkCycle * 2)) * 0.12;
+                f.bodyPivot.rotation.x = 0.16; // Heroic forward dash lean
+
+                // Footstep dust particles
+                f.stepParticleTimer += dt;
+                if (f.stepParticleTimer > 0.14) {
+                    f.stepParticleTimer = 0;
+                    const skin = SKIN_COLORS.find(s => s.id === f.colorId) || SKIN_COLORS[0];
+                    spawnParticles(
+                        f.root.position.clone().add(new THREE.Vector3(0, 0.15, 0)),
+                        2,
+                        gameState.modeId === 'HYPERSPEED' ? skin.glow : 0x94a3b8,
+                        3.5, 0.65, 0.28, 4
+                    );
+                }
+            } else {
+                f.leftLegPivot.rotation.x *= Math.pow(0.01, dt);
+                f.rightLegPivot.rotation.x *= Math.pow(0.01, dt);
+                f.leftArmPivot.rotation.x *= Math.pow(0.01, dt);
+                f.bodyPivot.position.y = 1.1 + Math.sin(f.idleTime * 3.5) * 0.05;
+                f.bodyPivot.rotation.x *= Math.pow(0.01, dt);
+            }
+
+            // Attack Swing Animation on Right Arm & Torso
+            if (f.swingTimer > 0) {
+                f.swingTimer = Math.max(0, f.swingTimer - dt);
+                const p = f.swingTimer / 0.28;
+                f.rightArmPivot.rotation.x = -Math.sin(p * Math.PI) * 1.45;
+                f.bodyPivot.rotation.y = Math.sin(p * Math.PI) * 0.45;
+            } else {
+                f.rightArmPivot.rotation.x *= Math.pow(0.005, dt);
+                f.bodyPivot.rotation.y *= Math.pow(0.005, dt);
+            }
+        }
+
         function updateFighterLogic(f, enemy, input, dt) {
             if (f.cooldown > 0) f.cooldown = Math.max(0, f.cooldown - dt);
             if (f.slowTimer > 0) f.slowTimer = Math.max(0, f.slowTimer - dt);
@@ -1204,7 +1564,7 @@
 
             const isMovingInput = (input.moveX !== 0 || input.moveZ !== 0);
 
-            // Healing 2.0s Channeling Check (Must stand still!)
+            // 2.0s Stand-Still Healing Channeling
             if (input.heal && !f.isHealing && f.potions > 0 && f.hp < f.maxHp && !isMovingInput && !input.attack) {
                 f.isHealing = true;
                 f.healTimer = 0;
@@ -1215,57 +1575,61 @@
                 if (isMovingInput || input.attack) {
                     f.isHealing = false;
                     f.healRing.visible = false;
-                    spawnDamagePopup(f.root.position, 'HỦY HỒI MÁU!', '#fb7185');
+                    spawnDamagePopup(f.root.position, '💔 HỦY HỒI MÁU!', '#fb7185');
                 } else {
                     f.healTimer += dt;
-                    f.healRing.rotation.z += dt * 4;
+                    f.healRing.rotation.z += dt * 4.5;
+                    if (Math.random() < 0.35) {
+                        spawnParticles(f.root.position.clone().add(new THREE.Vector3((Math.random()-0.5)*1.6, 0.5, (Math.random()-0.5)*1.6)), 1, 0x34d399, 4, 0.8, 0.45, -6);
+                    }
                     if (f.healTimer >= 2.0) {
                         f.isHealing = false;
                         f.healRing.visible = false;
                         f.potions = Math.max(0, f.potions - 1);
                         f.hp = Math.min(f.maxHp, f.hp + 65);
-                        spawnDamagePopup(f.root.position, '+65 HP (Bình Máu)', '#34d399');
-                        playTone(680, 'sine', 0.25, 0.18);
+                        spawnParticles(f.root.position.clone().add(new THREE.Vector3(0, 1.8, 0)), 18, 0x34d399, 9, 1.1, 0.5, -4);
+                        spawnDamagePopup(f.root.position, '💚 +65 HP (Bình Máu)', '#34d399');
+                        playSound(580, 'sine', 0.28, 0.2, 880);
 
                         if (gameState.modeId === 'FATEWHEEL') {
                             const newWep = WEAPON_KEYS[Math.floor(Math.random() * WEAPON_KEYS.length)];
                             f.equipWeapon(newWep);
-                            spawnDamagePopup(f.root.position, `Định Mệnh: ${WEAPON_SPECS[newWep].name}`, '#facc15');
+                            spawnDamagePopup(f.root.position, `🎰 Định Mệnh: ${WEAPON_SPECS[newWep].name}`, '#facc15');
                         }
                     }
                 }
             }
 
-            // Movement
+            // Movement Speed & Smooth Rotation
             const spec = WEAPON_SPECS[f.weaponId] || WEAPON_SPECS.katana;
-            let baseSpeed = 12.5 * (spec.speed || 1.0);
+            let baseSpeed = 13.5 * (spec.speed || 1.0);
             if (gameState.modeId === 'HYPERSPEED') baseSpeed *= 1.5;
             if (f.slowTimer > 0) baseSpeed *= 0.5;
 
+            let moveVelX = 0, moveVelZ = 0;
             if (!f.isHealing && isMovingInput) {
                 const len = Math.hypot(input.moveX, input.moveZ);
                 const nx = input.moveX / len;
                 const nz = input.moveZ / len;
-                f.root.position.x += nx * baseSpeed * dt;
-                f.root.position.z += nz * baseSpeed * dt;
-                f.root.rotation.y = Math.atan2(nx, nz);
-                f.walkCycle += dt * 14;
-                f.leftLeg.rotation.x = Math.sin(f.walkCycle) * 0.6;
-                f.rightLeg.rotation.x = -Math.sin(f.walkCycle) * 0.6;
-            } else {
-                f.leftLeg.rotation.x *= 0.85;
-                f.rightLeg.rotation.x *= 0.85;
+                moveVelX = nx * baseSpeed;
+                moveVelZ = nz * baseSpeed;
+                f.root.position.x += moveVelX * dt;
+                f.root.position.z += moveVelZ * dt;
+                f.targetAngle = Math.atan2(nx, nz);
             }
+
+            // Smooth rotation interpolation
+            f.root.rotation.y = lerpAngle(f.root.rotation.y, f.targetAngle, dt * 16);
 
             // Knockback & Vertical Gravity
             f.root.position.x += f.vx * dt;
             f.root.position.z += f.vz * dt;
-            f.vx *= Math.pow(0.05, dt);
-            f.vz *= Math.pow(0.05, dt);
+            f.vx *= Math.pow(0.04, dt);
+            f.vz *= Math.pow(0.04, dt);
 
             if (f.root.position.y > 0 || f.vy > 0) {
                 f.root.position.y += f.vy * dt;
-                f.vy -= 36 * dt;
+                f.vy -= 38 * dt;
                 if (f.root.position.y <= 0) {
                     f.root.position.y = 0;
                     f.vy = 0;
@@ -1273,8 +1637,8 @@
             }
 
             // Arena Boundaries & Pillar Collisions
-            const halfW = ARENA_W / 2 - 1.2;
-            const halfD = ARENA_D / 2 - 1.2;
+            const halfW = ARENA_W / 2 - 1.5;
+            const halfD = ARENA_D / 2 - 1.5;
             f.root.position.x = Math.max(-halfW, Math.min(halfW, f.root.position.x));
             f.root.position.z = Math.max(-halfD, Math.min(halfD, f.root.position.z));
 
@@ -1282,92 +1646,119 @@
                 const dx = f.root.position.x - ob.x;
                 const dz = f.root.position.z - ob.z;
                 const dist = Math.hypot(dx, dz);
-                const minDist = ob.r + 0.75;
+                const minDist = ob.r + 1.05;
                 if (dist < minDist && dist > 0.001) {
                     f.root.position.x = ob.x + (dx / dist) * minDist;
                     f.root.position.z = ob.z + (dz / dist) * minDist;
                 }
             });
 
+            // Save instantaneous velocity for Online interpolation
+            f.netTargetVel.set(moveVelX + f.vx, 0, moveVelZ + f.vz);
+
             // Attack Trigger
             if (input.attack && f.cooldown <= 0 && !f.isHealing) {
-                triggerFighterAttack(f, enemy);
+                triggerFighterAttack(f, enemy, false);
             }
 
-            // Arm Swing Animation
-            if (f.swingTimer > 0) {
-                f.swingTimer -= dt;
-                f.rightArmPivot.rotation.x = -Math.sin(f.swingTimer * 25) * 1.1;
-            } else {
-                f.rightArmPivot.rotation.x = 0;
-            }
+            animateStickmanJoints(f, isMovingInput, dt);
         }
 
-        function updateProjectilesAndAirdrops(dt) {
+        function updateProjectilesAndEffects(dt) {
             for (let i = projectiles.length - 1; i >= 0; i--) {
                 const p = projectiles[i];
                 p.life -= dt;
                 p.age += dt;
+                p.trailTick += dt;
                 const enemy = p.owner.id === 'p1' ? p2 : p1;
 
                 if (p.kind === 'lob') {
-                    p.vel.y -= 26 * dt;
+                    p.vel.y -= 27 * dt;
                 } else if (p.kind === 'boomerang' && p.age > 0.55) {
-                    const toOwner = p.owner.root.position.clone().add(new THREE.Vector3(0, 1.5, 0)).sub(p.mesh.position).normalize();
-                    p.vel.lerp(toOwner.multiplyScalar(28), dt * 6);
+                    const toOwner = p.owner.root.position.clone().add(new THREE.Vector3(0, 2.0, 0)).sub(p.mesh.position).normalize();
+                    p.vel.lerp(toOwner.multiplyScalar(30), dt * 6.5);
                 } else if (p.kind === 'drone') {
-                    const toEnemy = enemy.root.position.clone().add(new THREE.Vector3(0, 1.5, 0)).sub(p.mesh.position).normalize();
-                    p.vel.lerp(toEnemy.multiplyScalar(22), dt * 5);
+                    const toEnemy = enemy.root.position.clone().add(new THREE.Vector3(0, 2.0, 0)).sub(p.mesh.position).normalize();
+                    p.vel.lerp(toEnemy.multiplyScalar(24), dt * 5.5);
                 } else if (p.kind === 'blackhole') {
                     const toHole = p.mesh.position.clone().sub(enemy.root.position);
-                    if (toHole.length() < 9.5) {
+                    if (toHole.length() < 10.5) {
                         toHole.normalize();
-                        enemy.root.position.x += toHole.x * 10 * dt;
-                        enemy.root.position.z += toHole.z * 10 * dt;
+                        enemy.root.position.x += toHole.x * 11.5 * dt;
+                        enemy.root.position.z += toHole.z * 11.5 * dt;
                     }
+                }
+
+                // Projectile Particle Trails
+                if (p.trailTick > 0.035) {
+                    p.trailTick = 0;
+                    spawnParticles(p.mesh.position, 1, p.spec.hex, 2.5, 0.75, 0.22, 0);
                 }
 
                 p.mesh.position.addScaledVector(p.vel, dt);
 
-                const hitDist = enemy.root.position.clone().add(new THREE.Vector3(0, 1.5, 0)).distanceTo(p.mesh.position);
+                const hitDist = enemy.root.position.clone().add(new THREE.Vector3(0, 2.0, 0)).distanceTo(p.mesh.position);
                 const hitGround = p.mesh.position.y <= 0.25;
 
-                if (hitDist < 1.45 || hitGround || p.life <= 0) {
+                if (hitDist < 1.85 || hitGround || p.life <= 0) {
                     const rad = p.spec.rad || 0;
                     if (rad > 0) {
                         createExplosionFX(p.mesh.position, rad, p.spec.hex);
-                        [p1, p2].forEach(target => {
-                            if (target.id === p.owner.id) return;
-                            const d = target.root.position.distanceTo(p.mesh.position);
-                            if (d <= rad) {
-                                const pushDir = target.root.position.clone().sub(p.mesh.position).normalize();
-                                applyDamage(p.owner, target, p.spec.dmg, pushDir, p.spec.kb);
-                                if (p.kind === 'ice') target.slowTimer = 3.0;
-                            }
-                        });
-                    } else if (hitDist < 1.45) {
-                        const pushDir = p.vel.clone().normalize();
-                        applyDamage(p.owner, enemy, p.spec.dmg, pushDir, p.spec.kb);
-                        if (p.kind === 'poison') enemy.poisonTimer = 3.5;
+                        if (!gameState.isOnline || gameState.networkRole === 'HOST') {
+                            [p1, p2].forEach(target => {
+                                if (target.id === p.owner.id) return;
+                                const d = target.root.position.distanceTo(p.mesh.position);
+                                if (d <= rad + 0.8) {
+                                    const pushDir = target.root.position.clone().sub(p.mesh.position).normalize();
+                                    applyDamage(p.owner, target, p.spec.dmg, pushDir, p.spec.kb);
+                                    if (p.kind === 'ice') target.slowTimer = 3.0;
+                                }
+                            });
+                        }
+                    } else if (hitDist < 1.85) {
+                        spawnParticles(p.mesh.position, 10, p.spec.hex, 9, 0.9, 0.3, 12);
+                        if (!gameState.isOnline || gameState.networkRole === 'HOST') {
+                            const pushDir = p.vel.clone().normalize();
+                            applyDamage(p.owner, enemy, p.spec.dmg, pushDir, p.spec.kb);
+                            if (p.kind === 'poison') enemy.poisonTimer = 3.5;
+                        }
                     }
                     scene.remove(p.mesh);
                     projectiles.splice(i, 1);
                 }
             }
 
+            // Bomber Jets flying across sky
+            for (let i = bomberPlanes.length - 1; i >= 0; i--) {
+                const b = bomberPlanes[i];
+                b.life -= dt;
+                b.mesh.position.x += 58 * dt;
+                if (Math.random() < 0.6) {
+                    spawnParticles(b.mesh.position.clone().add(new THREE.Vector3(-3.5, 0, 0)), 1, 0xf97316, 4, 1.2, 0.3, 0);
+                }
+                if (b.life <= 0) {
+                    scene.remove(b.mesh);
+                    bomberPlanes.splice(i, 1);
+                }
+            }
+
             // Airdrops
             for (let i = airdrops.length - 1; i >= 0; i--) {
                 const a = airdrops[i];
-                if (a.mesh.position.y > 0.85) {
-                    a.mesh.position.y = Math.max(0.85, a.mesh.position.y - 6.5 * dt);
-                    if (a.mesh.position.y <= 0.85 && a.chute) a.chute.visible = false;
+                if (a.mesh.position.y > 1.05) {
+                    a.mesh.position.y = Math.max(1.05, a.mesh.position.y - 7.5 * dt);
+                    if (a.mesh.position.y <= 1.05 && a.chute) {
+                        a.chute.visible = false;
+                        createExplosionFX(a.mesh.position, 2.5, 0xf59e0b);
+                    }
                 } else {
-                    a.mesh.rotation.y += dt * 1.5;
+                    a.mesh.rotation.y += dt * 1.8;
                     [p1, p2].forEach(f => {
-                        if (f.root.position.distanceTo(a.mesh.position) < 2.2) {
+                        if (f.root.position.distanceTo(a.mesh.position) < 2.6) {
                             f.equipWeapon(a.weaponId);
-                            spawnDamagePopup(f.root.position, `Nhặt Thính: ${WEAPON_SPECS[a.weaponId].name}!`, '#38bdf8');
-                            playTone(820, 'sine', 0.2, 0.18);
+                            spawnParticles(a.mesh.position, 16, 0x38bdf8, 10, 1.1, 0.45, 10);
+                            spawnDamagePopup(f.root.position, `🎁 Nhặt Thính: ${WEAPON_SPECS[a.weaponId].name}!`, '#38bdf8');
+                            playSound(820, 'sine', 0.22, 0.18, 1200);
                             scene.remove(a.mesh);
                             airdrops.splice(i, 1);
                         }
@@ -1375,12 +1766,13 @@
                 }
             }
 
-            // Visual Explosions & Beams
+            // Visual Explosions, Shockwaves & Slash Arcs
             for (let i = visualFx.length - 1; i >= 0; i--) {
                 const fx = visualFx[i];
                 fx.life -= dt;
+                const progress = 1 - fx.life / fx.maxLife;
                 if (fx.maxRadius > 1) {
-                    const s = 1 + (1 - fx.life / fx.maxLife) * fx.maxRadius;
+                    const s = 1 + progress * fx.maxRadius;
                     fx.mesh.scale.set(s, s, s);
                 }
                 fx.mesh.material.opacity = Math.max(0, fx.life / fx.maxLife);
@@ -1389,11 +1781,21 @@
                     visualFx.splice(i, 1);
                 }
             }
+
+            // 3D Particle Pool
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const pt = particles[i];
+                pt.life -= dt;
+                pt.vel.y -= pt.gravity * dt;
+                pt.mesh.position.addScaledVector(pt.vel, dt);
+                pt.mesh.material.opacity = Math.max(0, pt.life / pt.maxLife);
+                if (pt.life <= 0) {
+                    scene.remove(pt.mesh);
+                    particles.splice(i, 1);
+                }
+            }
         }
 
-        // ============================================================================
-        // 11. UI & HUD UPDATERS
-        // ============================================================================
         function updateHealFloatingBar(fighter, elId, barId) {
             const box = document.getElementById(elId);
             if (!fighter.isHealing) {
@@ -1402,7 +1804,7 @@
             }
             box.classList.remove('hidden');
             const v = fighter.root.position.clone();
-            v.y += 3.6;
+            v.y += 4.6;
             v.project(camera);
             box.style.left = `${(v.x * 0.5 + 0.5) * window.innerWidth}px`;
             box.style.top = `${(-v.y * 0.5 + 0.5) * window.innerHeight}px`;
@@ -1412,17 +1814,17 @@
         function updateHUD() {
             document.getElementById('hud-p1-hp-text').textContent = `${Math.ceil(p1.hp)} / ${p1.maxHp}`;
             document.getElementById('hud-p1-hp-bar').style.width = `${(p1.hp / p1.maxHp) * 100}%`;
-            document.getElementById('hud-p1-potions').textContent = `${p1.potions}/20 Bình (Q)`;
+            document.getElementById('hud-p1-potions').textContent = `🧪 ${p1.potions}/20 Bình (Q)`;
             document.getElementById('hud-p1-weapon').textContent = WEAPON_SPECS[p1.weaponId]?.name || p1.weaponId;
             document.getElementById('hud-p1-cd-bar').style.width = `${p1.maxCooldown > 0 ? (1 - p1.cooldown / p1.maxCooldown) * 100 : 100}%`;
 
             document.getElementById('hud-p2-hp-text').textContent = `${Math.ceil(p2.hp)} / ${p2.maxHp}`;
             document.getElementById('hud-p2-hp-bar').style.width = `${(p2.hp / p2.maxHp) * 100}%`;
-            document.getElementById('hud-p2-potions').textContent = `${p2.potions}/20 Bình (Y)`;
+            document.getElementById('hud-p2-potions').textContent = `🧪 ${p2.potions}/20 Bình (Y)`;
             document.getElementById('hud-p2-weapon').textContent = WEAPON_SPECS[p2.weaponId]?.name || p2.weaponId;
             document.getElementById('hud-p2-cd-bar').style.width = `${p2.maxCooldown > 0 ? (1 - p2.cooldown / p2.maxCooldown) * 100 : 100}%`;
 
-            document.getElementById('hud-airdrop-timer').textContent = `Thính: ${Math.ceil(gameState.airdropTimer)}s`;
+            document.getElementById('hud-airdrop-timer').textContent = `📦 Thính: ${Math.ceil(gameState.airdropTimer)}s`;
             document.getElementById('score-p1').textContent = gameState.scores.p1;
             document.getElementById('score-p2').textContent = gameState.scores.p2;
 
@@ -1430,9 +1832,6 @@
             updateHealFloatingBar(p2, 'p2-heal-ui', 'p2-heal-progress');
         }
 
-        // ============================================================================
-        // 12. MATCH FLOW & MENU BUILDERS
-        // ============================================================================
         function startBattleMatch(fromNetwork = false) {
             if (gameState.isOnline && gameState.networkRole === 'HOST' && !fromNetwork && conn && conn.open) {
                 conn.send({
@@ -1463,6 +1862,7 @@
 
             projectiles.forEach(p => scene.remove(p.mesh)); projectiles = [];
             airdrops.forEach(a => scene.remove(a.mesh)); airdrops = [];
+            bomberPlanes.forEach(b => scene.remove(b.mesh)); bomberPlanes = [];
 
             const modeObj = GAME_MODES.find(m => m.id === gameState.modeId);
             document.getElementById('hud-mode-badge').textContent = modeObj ? modeObj.name : 'ĐẤU TỰ DO';
@@ -1478,7 +1878,6 @@
 
             gameState.inBattle = true;
             updateHUD();
-            // Focus window so keyboard controls respond immediately
             window.focus();
             document.body.focus();
         }
@@ -1497,15 +1896,17 @@
 
         function showRoundVictoryModal(winnerId) {
             gameState.inBattle = false;
+            const winFighter = winnerId === 'p1' ? p1 : p2;
+            spawnParticles(winFighter.root.position.clone().add(new THREE.Vector3(0, 3, 0)), 32, 0xfacc15, 14, 1.3, 0.8, 12);
+            playSound(520, 'triangle', 0.4, 0.2, 880);
             document.getElementById('winner-title').textContent = winnerId === 'p1'
-                ? 'NGƯỜI CHƠI 1 CHIẾN THẮNG!'
-                : 'NGƯỜI CHƠI 2 CHIẾN THẮNG!';
+                ? '🏆 NGƯỜI CHƠI 1 CHIẾN THẮNG!'
+                : '🏆 NGƯỜI CHƠI 2 CHIẾN THẮNG!';
             document.getElementById('victory-modal').classList.remove('hidden');
             updateHUD();
         }
 
         function renderMenuSelections() {
-            // 1. Modes
             const modeBox = document.getElementById('mode-list-container');
             modeBox.innerHTML = '';
             GAME_MODES.forEach(m => {
@@ -1523,13 +1924,13 @@
                 btn.addEventListener('click', () => {
                     if (gameState.isOnline && gameState.networkRole === 'CLIENT') return;
                     gameState.modeId = m.id;
+                    p1.updateScale(); p2.updateScale();
                     renderMenuSelections();
                     sendLobbyConfigSync();
                 });
                 modeBox.appendChild(btn);
             });
 
-            // 2. Maps
             const mapBox = document.getElementById('map-list-container');
             mapBox.innerHTML = '';
             ARENA_MAPS.forEach(mp => {
@@ -1548,7 +1949,6 @@
                 mapBox.appendChild(btn);
             });
 
-            // 3. Skins & 26 Weapons for P1 and P2
             ['p1', 'p2'].forEach(pid => {
                 const cfg = pid === 'p1' ? gameState.p1Config : gameState.p2Config;
                 const colorBox = document.getElementById(`${pid}-color-list`);
@@ -1593,10 +1993,7 @@
             });
         }
 
-        // ============================================================================
-        // 13. CAMERA CONTROLLER & MAIN ANIMATION LOOP
-        // ============================================================================
-        let camAngle = 0, camHeight = 25, camDist = 34, isDraggingCam = false, prevMouseX = 0;
+        let camAngle = 0, camHeight = 14.5, camDist = 23, camZoomOffset = 0, isDraggingCam = false, prevMouseX = 0;
         container.addEventListener('mousedown', e => { isDraggingCam = true; prevMouseX = e.clientX; window.focus(); });
         window.addEventListener('mouseup', () => { isDraggingCam = false; });
         window.addEventListener('mousemove', e => {
@@ -1605,6 +2002,10 @@
                 prevMouseX = e.clientX;
             }
         });
+        container.addEventListener('wheel', e => {
+            camZoomOffset = Math.max(-8, Math.min(14, camZoomOffset + e.deltaY * 0.015));
+        }, { passive: true });
+
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
@@ -1617,29 +2018,51 @@
             const dt = Math.min(0.05, (now - lastTime) / 1000);
             lastTime = now;
 
+            if (ambientStars) ambientStars.rotation.y += dt * 0.04;
+
             if (gameState.inBattle) {
                 if (!gameState.isOnline) {
                     updateFighterLogic(p1, p2, getLocalKeyboardInput('p1'), dt);
                     updateFighterLogic(p2, p1, getLocalKeyboardInput('p2'), dt);
-                    updateProjectilesAndAirdrops(dt);
+                    updateProjectilesAndEffects(dt);
                 } else if (gameState.networkRole === 'HOST') {
                     updateFighterLogic(p1, p2, getLocalKeyboardInput('p1'), dt);
                     updateFighterLogic(p2, p1, remoteInput, dt);
-                    updateProjectilesAndAirdrops(dt);
+                    updateProjectilesAndEffects(dt);
 
-                    if (conn && conn.open) {
+                    // Send high-frequency snapshots for smooth Online interpolation
+                    if (conn && conn.open && now - lastSnapSent > 28) {
+                        lastSnapSent = now;
                         conn.send({
                             type: 'STATE_SNAP',
                             airdropTimer: gameState.airdropTimer,
-                            p1: { x: p1.root.position.x, y: p1.root.position.y, z: p1.root.position.z, ry: p1.root.rotation.y, hp: p1.hp, pot: p1.potions, heal: p1.isHealing, ht: p1.healTimer, wep: p1.weaponId },
-                            p2: { x: p2.root.position.x, y: p2.root.position.y, z: p2.root.position.z, ry: p2.root.rotation.y, hp: p2.hp, pot: p2.potions, heal: p2.isHealing, ht: p2.healTimer, wep: p2.weaponId }
+                            p1: {
+                                x: p1.root.position.x, y: p1.root.position.y, z: p1.root.position.z,
+                                vx: p1.netTargetVel.x, vz: p1.netTargetVel.z,
+                                ry: p1.root.rotation.y, hp: p1.hp, pot: p1.potions, heal: p1.isHealing, ht: p1.healTimer, wep: p1.weaponId
+                            },
+                            p2: {
+                                x: p2.root.position.x, y: p2.root.position.y, z: p2.root.position.z,
+                                vx: p2.netTargetVel.x, vz: p2.netTargetVel.z,
+                                ry: p2.root.rotation.y, hp: p2.hp, pot: p2.potions, heal: p2.isHealing, ht: p2.healTimer, wep: p2.weaponId
+                            }
                         });
                     }
                 } else if (gameState.networkRole === 'CLIENT') {
+                    const localIn = getLocalKeyboardInput('p2');
                     if (conn && conn.open) {
-                        conn.send({ type: 'CLIENT_INPUT', input: getLocalKeyboardInput('p2') });
+                        conn.send({ type: 'CLIENT_INPUT', input: localIn });
                     }
-                    updateProjectilesAndAirdrops(dt);
+                    // Smooth 60FPS Client Interpolation + Velocity Prediction
+                    [p1, p2].forEach(f => {
+                        f.netTargetPos.x += f.netTargetVel.x * dt * 0.45;
+                        f.netTargetPos.z += f.netTargetVel.z * dt * 0.45;
+                        f.root.position.lerp(f.netTargetPos, Math.min(1, dt * 18));
+                        f.root.rotation.y = lerpAngle(f.root.rotation.y, f.netTargetAngle, dt * 18);
+                        const moving = Math.hypot(f.netTargetVel.x, f.netTargetVel.z) > 0.6;
+                        animateStickmanJoints(f, moving, dt);
+                    });
+                    updateProjectilesAndEffects(dt);
                 }
 
                 // Mode Timers (Host or Offline)
@@ -1655,46 +2078,64 @@
                             gameState.gunGameTimer = 12;
                             p1.equipWeapon(WEAPON_KEYS[Math.floor(Math.random() * WEAPON_KEYS.length)]);
                             p2.equipWeapon(WEAPON_KEYS[Math.floor(Math.random() * WEAPON_KEYS.length)]);
-                            spawnDamagePopup(p1.root.position, 'ĐỔI VŨ KHÍ!', '#38bdf8');
-                            spawnDamagePopup(p2.root.position, 'ĐỔI VŨ KHÍ!', '#38bdf8');
+                            spawnDamagePopup(p1.root.position, '🔄 ĐỔI VŨ KHÍ!', '#38bdf8');
+                            spawnDamagePopup(p2.root.position, '🔄 ĐỔI VŨ KHÍ!', '#38bdf8');
                         }
                     }
                     if (gameState.modeId === 'METEOR') {
                         gameState.meteorTimer -= dt;
                         if (gameState.meteorTimer <= 0) {
-                            gameState.meteorTimer = 2.2;
-                            const dropPos = new THREE.Vector3((Math.random() - 0.5) * 44, 22, (Math.random() - 0.5) * 28);
-                            spawnProjectile(p1, dropPos, new THREE.Vector3(0, -22, 0), WEAPON_SPECS.meteorstaff, 'meteor_drop');
+                            gameState.meteorTimer = 2.0;
+                            const dropPos = new THREE.Vector3((Math.random() - 0.5) * 44, 24, (Math.random() - 0.5) * 28);
+                            spawnProjectile(p1, dropPos, new THREE.Vector3(0, -24, 0), WEAPON_SPECS.meteorstaff, 'meteor_drop');
                         }
                     }
                 }
 
-                if (gameState.isOnline && conn && conn.open && now - lastPingSent > 1500) {
+                if (gameState.isOnline && conn && conn.open && now - lastPingSent > 1200) {
                     lastPingSent = now;
                     conn.send({ type: 'PING', t: performance.now() });
                 }
 
                 updateHUD();
+            } else {
+                // Idle breathing animation in Lobby preview
+                animateStickmanJoints(p1, false, dt);
+                animateStickmanJoints(p2, false, dt);
             }
 
-            // Dynamic Camera Tracking Both Stickmen
+            // Closer Heroic Camera Tracking Both Stickmen + Screen Shake
             const midX = (p1.root.position.x + p2.root.position.x) * 0.5;
             const midZ = (p1.root.position.z + p2.root.position.z) * 0.5;
             const sep = p1.root.position.distanceTo(p2.root.position);
-            const targetDist = Math.max(26, Math.min(48, sep * 0.95 + 16));
-            camDist += (targetDist - camDist) * 0.08;
+            const targetDist = Math.max(17, Math.min(35, sep * 0.72 + 12.5)) + camZoomOffset;
+            camDist += (targetDist - camDist) * 0.1;
 
-            camera.position.x = midX + Math.sin(camAngle) * camDist;
+            let shakeX = 0, shakeY = 0;
+            if (gameState.screenShake > 0) {
+                shakeX = (Math.random() - 0.5) * gameState.screenShake;
+                shakeY = (Math.random() - 0.5) * gameState.screenShake;
+                gameState.screenShake = Math.max(0, gameState.screenShake - dt * 3.8);
+            }
+
+            camera.position.x = midX + Math.sin(camAngle) * camDist + shakeX;
             camera.position.z = midZ + Math.cos(camAngle) * camDist;
-            camera.position.y = camHeight + (camDist - 26) * 0.45;
-            camera.lookAt(midX, 1.5, midZ);
+            camera.position.y = camHeight + (camDist - 18) * 0.42 + shakeY;
+            camera.lookAt(midX, 2.3, midZ);
 
             renderer.render(scene, camera);
         }
 
-        // ============================================================================
-        // 14. BUTTON EVENT LISTENERS & INITIALIZATION
-        // ============================================================================
+        function copyTextToClipboard(text, msg) {
+            const temp = document.createElement('input');
+            temp.value = text;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand('copy');
+            temp.remove();
+            document.getElementById('online-conn-msg').textContent = msg;
+        }
+
         document.getElementById('btn-lobby-offline').addEventListener('click', () => {
             gameState.isOnline = false;
             gameState.networkRole = 'OFFLINE';
@@ -1729,13 +2170,12 @@
         document.getElementById('btn-create-room').addEventListener('click', () => initHostRoom());
         document.getElementById('btn-copy-code').addEventListener('click', () => {
             if (!gameState.roomCode) return;
-            const temp = document.createElement('input');
-            temp.value = gameState.roomCode;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand('copy');
-            temp.remove();
-            document.getElementById('online-conn-msg').textContent = `Đã sao chép Mã Phòng [${gameState.roomCode}]!`;
+            copyTextToClipboard(gameState.roomCode, `📋 Đã sao chép Mã Phòng [${gameState.roomCode}]! Gửi mã này cho bạn bè nhé.`);
+        });
+        document.getElementById('btn-copy-link').addEventListener('click', () => {
+            if (!gameState.roomCode) return;
+            const url = `${window.location.origin}${window.location.pathname}?room=${gameState.roomCode}`;
+            copyTextToClipboard(url, `🔗 Đã sao chép Link Mời! Bạn bè mở link này sẽ tự động vào thẳng phòng [${gameState.roomCode}].`);
         });
         document.getElementById('btn-join-room').addEventListener('click', () => {
             const code = document.getElementById('input-join-code').value.trim();
@@ -1753,12 +2193,25 @@
             document.getElementById('start-menu').classList.remove('hidden');
         });
         document.getElementById('btn-drop-now').addEventListener('click', () => spawnAirdropCrate());
-        document.getElementById('btn-reset-cam').addEventListener('click', () => { camAngle = 0; });
+        document.getElementById('btn-reset-cam').addEventListener('click', () => { camAngle = 0; camZoomOffset = 0; });
 
         window.addEventListener('DOMContentLoaded', () => {
             buildArenaMap('cyber');
             renderMenuSelections();
             animate(performance.now());
+
+            // Auto-join if opened with ?room=12345 link
+            const params = new URLSearchParams(window.location.search);
+            const roomParam = params.get('room');
+            if (roomParam && roomParam.trim().length >= 4) {
+                gameState.isOnline = true;
+                document.getElementById('online-room-panel').classList.remove('hidden');
+                document.getElementById('online-status-pill').classList.remove('hidden');
+                document.getElementById('outer-lobby').classList.add('hidden');
+                document.getElementById('start-menu').classList.remove('hidden');
+                document.getElementById('input-join-code').value = roomParam.trim();
+                joinHostRoom(roomParam.trim());
+            }
         });
     </script>
 </body>
