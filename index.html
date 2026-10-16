@@ -69,12 +69,114 @@
             position: absolute; pointer-events: none;
             transform: translate(-50%, -100%); z-index: 25;
         }
+        .device-option-card {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+        }
+        .device-option-card:hover {
+            transform: translateY(-3px) scale(1.02);
+        }
+        .device-option-card.selected-device {
+            border-color: #38bdf8 !important;
+            background: rgba(14, 116, 144, 0.35) !important;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.45);
+        }
+        .joystick-base {
+            position: relative;
+            width: 136px;
+            height: 136px;
+            border-radius: 9999px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, rgba(15, 23, 42, 0.82) 75%);
+            border: 2.5px solid rgba(56, 189, 248, 0.6);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), inset 0 0 18px rgba(56, 189, 248, 0.25);
+            touch-action: none;
+        }
+        .joystick-stick {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 58px;
+            height: 58px;
+            margin-top: -29px;
+            margin-left: -29px;
+            border-radius: 9999px;
+            background: linear-gradient(145deg, #38bdf8, #2563eb);
+            border: 2.5px solid #e0f2fe;
+            box-shadow: 0 4px 16px rgba(56, 189, 248, 0.85);
+            pointer-events: none;
+            transition: transform 0.02s linear;
+        }
+        .mobile-combat-btn {
+            touch-action: none;
+            transition: transform 0.08s ease, filter 0.08s ease;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .mobile-combat-btn:active, .mobile-combat-btn.active-touch {
+            transform: scale(0.90);
+            filter: brightness(1.22);
+        }
     </style>
 </head>
 <body class="relative w-full h-full overflow-hidden" tabindex="0">
 
     <!-- 3D Render Canvas -->
     <div id="canvas-container" class="absolute inset-0 w-full h-full z-0"></div>
+
+    <!-- 0. INITIAL DEVICE SELECTION MODAL (CHỌN MÁY TÍNH HOẶC ĐIỆN THOẠI KHI BẮT ĐẦU) -->
+    <div id="device-select-modal" class="absolute inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+        <div class="glass-panel rounded-3xl max-w-2xl w-full p-6 md:p-8 text-center border-2 border-cyan-400/50 shadow-2xl">
+            <div class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-xs font-gaming font-bold uppercase tracking-widest mb-3">
+                ⚡ TỐI ƯU TRẢI NGHIỆM ĐIỀU KHIỂN
+            </div>
+            <h2 class="font-gaming text-2xl sm:text-4xl font-extrabold uppercase text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-amber-300 to-rose-400 mb-2">
+                BẠN ĐANG CHƠI TRÊN THIẾT BỊ NÀO?
+            </h2>
+            <p class="text-slate-300 text-xs sm:text-sm max-w-lg mx-auto mb-6">
+                Chọn thiết bị của bạn để hệ thống tự động thiết lập giao diện điều khiển tối ưu nhất cho cả chế độ <b>Online</b> và <b>Offline</b>:
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <!-- Option 1: PC -->
+                <button id="btn-choose-pc" type="button" class="device-option-card selected-device p-5 rounded-2xl bg-slate-900/90 border-2 border-slate-700 text-left flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-4xl">💻</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-gaming font-bold bg-blue-500/20 text-blue-300 border border-blue-400/40">BÀN PHÍM & CHUỘT</span>
+                        </div>
+                        <h3 class="font-gaming text-xl font-extrabold text-white mb-1 uppercase">CHƠI TRÊN MÁY TÍNH</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Điều khiển bằng phím <b>WASD + E + Q</b> (và <b>UHJK + I + Y</b> khi chơi 2 người 1 máy). Hỗ trợ xoay camera 3D bằng chuột.
+                        </p>
+                    </div>
+                    <div class="mt-4 py-2 px-3 rounded-xl bg-blue-600 text-white font-gaming font-bold text-xs text-center uppercase">
+                        Chọn Máy Tính (PC)
+                    </div>
+                </button>
+
+                <!-- Option 2: Mobile -->
+                <button id="btn-choose-mobile" type="button" class="device-option-card p-5 rounded-2xl bg-slate-900/90 border-2 border-slate-700 text-left flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-4xl">📱</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-gaming font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40">CẢM ỨNG ĐA ĐIỂM</span>
+                        </div>
+                        <h3 class="font-gaming text-xl font-extrabold text-white mb-1 uppercase">CHƠI TRÊN ĐIỆN THOẠI</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Tích hợp <b>Cần gạt Joystick 360° bên trái</b> và <b>Nút Đánh + Nút Hồi Máu bên phải</b> cực nhạy cho cả Online & Offline.
+                        </p>
+                    </div>
+                    <div class="mt-4 py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-rose-500 text-slate-950 font-gaming font-extrabold text-xs text-center uppercase">
+                        Chọn Điện Thoại (Mobile)
+                    </div>
+                </button>
+            </div>
+
+            <p class="text-[11px] text-slate-400">
+                * Bạn có thể chuyển đổi qua lại giữa chế độ <b>Máy Tính</b> và <b>Điện Thoại</b> bất cứ lúc nào tại Sảnh hoặc trong trận đấu.
+            </p>
+        </div>
+    </div>
 
     <!-- Floating Damage, Status & Heal Progress Layer -->
     <div id="fx-layer" class="absolute inset-0 pointer-events-none z-20 overflow-hidden">
@@ -114,6 +216,22 @@
                 <div class="p-2.5 rounded-xl bg-slate-900/90 border border-cyan-500/40 text-cyan-300">🔥 7 CHẾ ĐỘ CHƠI</div>
                 <div class="p-2.5 rounded-xl bg-slate-900/90 border border-purple-500/40 text-purple-300">🗺️ 5 BẢN ĐỒ 3D</div>
                 <div class="p-2.5 rounded-xl bg-slate-900/90 border border-emerald-500/40 text-emerald-300">💚 300 HP • 20 BÌNH</div>
+            </div>
+
+            <!-- Quick Device Selector inside Outer Lobby -->
+            <div class="mb-5 p-2.5 rounded-2xl bg-slate-900/95 border border-slate-700/90 flex flex-col sm:flex-row items-center justify-between gap-2">
+                <div class="flex items-center gap-2 text-xs font-gaming font-bold text-slate-200">
+                    <span>🎮 Thiết bị đang chọn:</span>
+                    <span id="lobby-current-device-badge" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 border border-cyan-400/50 text-cyan-300">💻 Máy Tính (PC)</span>
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button id="btn-lobby-switch-pc" type="button" class="btn-game flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-blue-600 text-white font-gaming font-bold text-xs border border-blue-300">
+                        💻 Chế độ Máy Tính
+                    </button>
+                    <button id="btn-lobby-switch-mobile" type="button" class="btn-game flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-gaming font-bold text-xs border border-slate-600">
+                        📱 Chế độ Điện Thoại
+                    </button>
+                </div>
             </div>
 
             <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -347,6 +465,12 @@
                     <button id="btn-open-menu" type="button" class="btn-game px-2.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-200 border border-slate-600">
                         ⚙ Đổi Vũ Khí / Map
                     </button>
+                    <button id="btn-toggle-device-hud" type="button" class="btn-game px-2 py-0.5 rounded bg-cyan-950 hover:bg-cyan-900 text-[11px] text-cyan-300 border border-cyan-500/40 font-gaming font-bold" title="Chuyển đổi điều khiển Máy Tính / Điện Thoại">
+                        💻 PC
+                    </button>
+                    <button id="btn-toggle-bot-hud" type="button" class="btn-game px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-amber-300 border border-amber-500/40 font-gaming font-bold" title="Bật/Tắt Máy (AI) điều khiển P2 khi chơi Offline">
+                        🤖 P2: Người
+                    </button>
                     <button id="btn-reset-cam" type="button" class="btn-game px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-slate-200 border border-slate-600" title="Đặt lại góc nhìn Camera">
                         🎥
                     </button>
@@ -410,6 +534,54 @@
                     <span id="key-j" data-key="j" class="key-badge">J</span>
                     <span id="key-k" data-key="k" class="key-badge">K</span>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MOBILE TOUCH CONTROLS: LEFT JOYSTICK & RIGHT ATTACK / HEAL BUTTONS -->
+    <div id="mobile-controls-overlay" class="hidden absolute inset-x-0 bottom-0 z-30 pointer-events-none p-4 sm:p-6 flex items-end justify-between">
+        <!-- BÊN TRÁI: CẦN GẠT JOYSTICK 360 ĐỘ -->
+        <div class="flex flex-col items-center gap-2 pointer-events-auto">
+            <span id="mobile-joy-label" class="px-2.5 py-0.5 rounded-full bg-slate-900/85 border border-cyan-400/40 text-[10px] font-gaming font-bold text-cyan-300 uppercase tracking-wider shadow">
+                🕹️ Di Chuyển 360°
+            </span>
+            <div id="mobile-joystick-zone" class="joystick-base">
+                <!-- Crosshair guides -->
+                <div class="absolute inset-x-3 top-1/2 h-[1px] bg-cyan-400/20 -translate-y-1/2 pointer-events-none"></div>
+                <div class="absolute inset-y-3 left-1/2 w-[1px] bg-cyan-400/20 -translate-x-1/2 pointer-events-none"></div>
+                <div id="mobile-joystick-knob" class="joystick-stick flex items-center justify-center">
+                    <span class="w-3 h-3 rounded-full bg-white/80"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- GIỮA DƯỚI: GỢI Ý NHANH CHO ĐIỆN THOẠI -->
+        <div class="hidden sm:flex items-center gap-2 glass-panel px-3.5 py-1.5 rounded-full text-[11px] text-slate-200 border border-cyan-400/30 pointer-events-auto mb-2">
+            <span>📱 Kéo màn hình trống để xoay góc nhìn 3D • Nhả Joystick đứng im 2s khi bấm <b>HỒI MÁU</b></span>
+        </div>
+
+        <!-- BÊN PHẢI: NÚT ĐÁNH & NÚT HỒI MÁU -->
+        <div class="flex items-end gap-3.5 sm:gap-5 pointer-events-auto">
+            <!-- Nút Hồi Máu (Heal) -->
+            <div class="flex flex-col items-center gap-1.5">
+                <span id="mobile-potion-badge" class="px-2 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-400/50 text-[10px] font-gaming font-bold text-emerald-300 shadow">
+                    🧪 20 Bình (+65 HP)
+                </span>
+                <button id="mobile-btn-heal" type="button" class="mobile-combat-btn w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-emerald-500 via-teal-500 to-green-600 border-3 border-emerald-200 shadow-[0_0_25px_rgba(16,185,129,0.65)] flex flex-col items-center justify-center text-white">
+                    <span class="text-xl sm:text-2xl leading-none">💚</span>
+                    <span class="font-gaming font-extrabold text-[11px] sm:text-xs uppercase tracking-wider mt-0.5">HỒI MÁU</span>
+                </button>
+            </div>
+
+            <!-- Nút Đánh (Attack) -->
+            <div class="flex flex-col items-center gap-1.5">
+                <span id="mobile-weapon-badge" class="px-2.5 py-0.5 rounded-full bg-amber-950/90 border border-amber-400/50 text-[10px] font-gaming font-bold text-amber-300 shadow truncate max-w-[110px]">
+                    ⚔️ Vũ Khí
+                </span>
+                <button id="mobile-btn-attack" type="button" class="mobile-combat-btn w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 border-4 border-amber-200 shadow-[0_0_32px_rgba(245,158,11,0.75)] flex flex-col items-center justify-center text-slate-950">
+                    <span class="text-2xl sm:text-3xl leading-none">🔥</span>
+                    <span class="font-gaming font-extrabold text-sm sm:text-base uppercase tracking-wider mt-1">ĐÁNH</span>
+                </button>
             </div>
         </div>
     </div>
@@ -513,6 +685,8 @@
         const ARENA_W = 56, ARENA_D = 38;
         let gameState = {
             inBattle: false,
+            deviceType: 'PC', // 'PC' | 'MOBILE'
+            p2BotEnabled: false, // Smart AI opponent option for solo Offline Mobile/PC
             isOnline: false,
             networkRole: 'OFFLINE', // 'OFFLINE' | 'HOST' | 'CLIENT'
             roomCode: '',
@@ -527,6 +701,83 @@
             p1Config: { colorId: 'xanh', weaponId: 'katana' },
             p2Config: { colorId: 'do',   weaponId: 'gun' }
         };
+
+        const mobileTouchState = {
+            joyActive: false,
+            joyTouchId: null,
+            moveX: 0,
+            moveZ: 0,
+            attackPressed: false,
+            healPressed: false
+        };
+
+        function setDeviceMode(mode, closeInitialModal = false) {
+            gameState.deviceType = mode === 'MOBILE' ? 'MOBILE' : 'PC';
+            const isMob = gameState.deviceType === 'MOBILE';
+
+            // Auto-enable P2 Smart AI when selecting Mobile in Offline mode so player can solo right away (can still toggle off)
+            if (isMob && !gameState.isOnline && closeInitialModal) {
+                gameState.p2BotEnabled = true;
+            }
+            updateBotToggleUI();
+
+            // Update Initial Modal Cards
+            const cardPc = document.getElementById('btn-choose-pc');
+            const cardMob = document.getElementById('btn-choose-mobile');
+            if (cardPc && cardMob) {
+                cardPc.classList.toggle('selected-device', !isMob);
+                cardMob.classList.toggle('selected-device', isMob);
+            }
+
+            // Update Outer Lobby Badges & Buttons
+            const badge = document.getElementById('lobby-current-device-badge');
+            const btnPc = document.getElementById('btn-lobby-switch-pc');
+            const btnMob = document.getElementById('btn-lobby-switch-mobile');
+            if (badge) {
+                badge.textContent = isMob ? '📱 Điện Thoại (Joystick + Nút Phải)' : '💻 Máy Tính (Bàn Phím & Chuột)';
+                badge.className = isMob
+                    ? 'px-2.5 py-1 rounded-lg bg-amber-500/20 border border-amber-400/50 text-amber-300'
+                    : 'px-2.5 py-1 rounded-lg bg-cyan-500/20 border border-cyan-400/50 text-cyan-300';
+            }
+            if (btnPc && btnMob) {
+                btnPc.className = !isMob
+                    ? 'btn-game flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-blue-600 text-white font-gaming font-bold text-xs border border-blue-300'
+                    : 'btn-game flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-gaming font-bold text-xs border border-slate-600';
+                btnMob.className = isMob
+                    ? 'btn-game flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-gaming font-extrabold text-xs border border-amber-300'
+                    : 'btn-game flex-1 sm:flex-initial px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 font-gaming font-bold text-xs border border-slate-600';
+            }
+
+            // Update HUD Toggle Button
+            const hudBtn = document.getElementById('btn-toggle-device-hud');
+            if (hudBtn) {
+                hudBtn.textContent = isMob ? '📱 Điện Thoại' : '💻 Máy Tính';
+            }
+
+            // If currently in battle, show appropriate control bar
+            if (gameState.inBattle) {
+                document.getElementById('bottom-controls-bar').classList.toggle('hidden', isMob);
+                document.getElementById('mobile-controls-overlay').classList.toggle('hidden', !isMob);
+            }
+
+            if (closeInitialModal) {
+                document.getElementById('device-select-modal').classList.add('hidden');
+            }
+        }
+
+        function updateBotToggleUI() {
+            const botBtn = document.getElementById('btn-toggle-bot-hud');
+            if (!botBtn) return;
+            if (gameState.isOnline) {
+                botBtn.classList.add('hidden');
+            } else {
+                botBtn.classList.remove('hidden');
+                botBtn.textContent = gameState.p2BotEnabled ? '🤖 P2: Máy AI' : '👤 P2: Người';
+                botBtn.className = gameState.p2BotEnabled
+                    ? 'btn-game px-2 py-0.5 rounded bg-emerald-950 hover:bg-emerald-900 text-[11px] text-emerald-300 border border-emerald-500/50 font-gaming font-bold'
+                    : 'btn-game px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] text-amber-300 border border-amber-500/40 font-gaming font-bold';
+            }
+        }
 
         let peer = null;
         let conn = null;
@@ -1309,6 +1560,16 @@
                     if (keys['d']) mx += 1;
                     atk = !!keys['e'];
                     heal = !!keys['q'];
+
+                    // Merge Mobile Left Joystick & Right Attack/Heal Buttons for P1
+                    if (gameState.deviceType === 'MOBILE') {
+                        if (Math.hypot(mobileTouchState.moveX, mobileTouchState.moveZ) > 0.08) {
+                            mx = mobileTouchState.moveX;
+                            mz = mobileTouchState.moveZ;
+                        }
+                        if (mobileTouchState.attackPressed) atk = true;
+                        if (mobileTouchState.healPressed) heal = true;
+                    }
                 } else {
                     if (keys['u']) mz -= 1;
                     if (keys['j']) mz += 1;
@@ -1316,6 +1577,11 @@
                     if (keys['k']) mx += 1;
                     atk = !!keys['i'];
                     heal = !!keys['y'];
+
+                    // If P2 AI Bot is active in Offline mode and no manual P2 keys pressed
+                    if (gameState.p2BotEnabled && mx === 0 && mz === 0 && !atk && !heal) {
+                        return computeSmartBotInput(p2, p1);
+                    }
                 }
             } else {
                 if (keys['w'] || keys['u']) mz -= 1;
@@ -1324,8 +1590,67 @@
                 if (keys['d'] || keys['k']) mx += 1;
                 atk = !!(keys['e'] || keys['i']);
                 heal = !!(keys['q'] || keys['y']);
+
+                // Merge Mobile Left Joystick & Right Attack/Heal Buttons for Online Player (Host P1 or Client P2)
+                if (gameState.deviceType === 'MOBILE') {
+                    if (Math.hypot(mobileTouchState.moveX, mobileTouchState.moveZ) > 0.08) {
+                        mx = mobileTouchState.moveX;
+                        mz = mobileTouchState.moveZ;
+                    }
+                    if (mobileTouchState.attackPressed) atk = true;
+                    if (mobileTouchState.healPressed) heal = true;
+                }
             }
             return { moveX: mx, moveZ: mz, attack: atk, heal: heal };
+        }
+
+        function computeSmartBotInput(bot, target) {
+            if (bot.isHealing) {
+                return { moveX: 0, moveZ: 0, attack: false, heal: false };
+            }
+            const dx = target.root.position.x - bot.root.position.x;
+            const dz = target.root.position.z - bot.root.position.z;
+            const dist = Math.hypot(dx, dz);
+
+            // Heal if low HP and enemy is reasonably far away
+            if (bot.hp < bot.maxHp * 0.42 && bot.potions > 0 && dist > 10.5) {
+                return { moveX: 0, moveZ: 0, attack: false, heal: true };
+            }
+
+            // Move toward airdrops if one is on the ground nearby
+            let goalX = target.root.position.x;
+            let goalZ = target.root.position.z;
+            if (airdrops.length > 0 && (bot.weaponId === 'unarmed' || dist > 9)) {
+                const drop = airdrops[0];
+                if (drop.mesh.position.y <= 3.5) {
+                    goalX = drop.mesh.position.x;
+                    goalZ = drop.mesh.position.z;
+                }
+            }
+
+            const spec = WEAPON_SPECS[bot.weaponId] || WEAPON_SPECS.katana;
+            const isMelee = ['melee', 'scythe', 'thor', 'gravity'].includes(spec.type);
+            const idealRange = isMelee ? (spec.range || 4.8) * 0.82 : 12.5;
+
+            let mx = 0, mz = 0;
+            const gDx = goalX - bot.root.position.x;
+            const gDz = goalZ - bot.root.position.z;
+            const gDist = Math.hypot(gDx, gDz);
+
+            if (gDist > idealRange) {
+                mx = gDx / (gDist || 1);
+                mz = gDz / (gDist || 1);
+            } else if (!isMelee && dist < 6.0) {
+                // Kite back slightly with ranged weapon
+                mx = -dx / (dist || 1);
+                mz = -dz / (dist || 1);
+            } else {
+                // Aim toward target
+                bot.targetAngle = Math.atan2(dx, dz);
+            }
+
+            const shouldAttack = dist <= (isMelee ? (spec.range || 5.2) + 0.8 : 24) && bot.cooldown <= 0;
+            return { moveX: mx, moveZ: mz, attack: shouldAttack, heal: false };
         }
 
         const PEER_PREFIX = 'stickman3d-vn-room-';
@@ -1828,6 +2153,19 @@
             document.getElementById('score-p1').textContent = gameState.scores.p1;
             document.getElementById('score-p2').textContent = gameState.scores.p2;
 
+            // Update Mobile Right-Side Badges for active local fighter (P1 or Online Client P2)
+            const activeLocalFighter = (gameState.isOnline && gameState.networkRole === 'CLIENT') ? p2 : p1;
+            const mobPot = document.getElementById('mobile-potion-badge');
+            const mobWep = document.getElementById('mobile-weapon-badge');
+            const mobJoyLabel = document.getElementById('mobile-joy-label');
+            if (mobPot) mobPot.textContent = `🧪 ${activeLocalFighter.potions}/20 Bình (+65 HP)`;
+            if (mobWep) mobWep.textContent = `⚔️ ${WEAPON_SPECS[activeLocalFighter.weaponId]?.name || activeLocalFighter.weaponId}`;
+            if (mobJoyLabel) {
+                mobJoyLabel.textContent = (gameState.isOnline && gameState.networkRole === 'CLIENT')
+                    ? '🕹️ Di Chuyển (P2)'
+                    : '🕹️ Di Chuyển (P1)';
+            }
+
             updateHealFloatingBar(p1, 'p1-heal-ui', 'p1-heal-progress');
             updateHealFloatingBar(p2, 'p2-heal-ui', 'p2-heal-progress');
         }
@@ -1874,7 +2212,11 @@
             document.getElementById('start-menu').classList.add('hidden');
             document.getElementById('victory-modal').classList.add('hidden');
             document.getElementById('game-hud').classList.remove('hidden');
-            document.getElementById('bottom-controls-bar').classList.remove('hidden');
+
+            const isMob = gameState.deviceType === 'MOBILE';
+            document.getElementById('bottom-controls-bar').classList.toggle('hidden', isMob);
+            document.getElementById('mobile-controls-overlay').classList.toggle('hidden', !isMob);
+            updateBotToggleUI();
 
             gameState.inBattle = true;
             updateHUD();
@@ -2005,6 +2347,141 @@
         container.addEventListener('wheel', e => {
             camZoomOffset = Math.max(-8, Math.min(14, camZoomOffset + e.deltaY * 0.015));
         }, { passive: true });
+
+        // Touch Camera Drag on empty 3D canvas area
+        let camTouchId = null, prevTouchX = 0;
+        container.addEventListener('touchstart', e => {
+            if (e.changedTouches.length > 0 && camTouchId === null) {
+                const t = e.changedTouches[0];
+                camTouchId = t.identifier;
+                prevTouchX = t.clientX;
+            }
+        }, { passive: true });
+        container.addEventListener('touchmove', e => {
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const t = e.changedTouches[i];
+                if (t.identifier === camTouchId) {
+                    camAngle -= (t.clientX - prevTouchX) * 0.007;
+                    prevTouchX = t.clientX;
+                }
+            }
+        }, { passive: true });
+        const endCamTouch = e => {
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                if (e.changedTouches[i].identifier === camTouchId) camTouchId = null;
+            }
+        };
+        container.addEventListener('touchend', endCamTouch, { passive: true });
+        container.addEventListener('touchcancel', endCamTouch, { passive: true });
+
+        // Left Virtual Analog Joystick Logic (Supports both Touch & Mouse testing)
+        const joyZone = document.getElementById('mobile-joystick-zone');
+        const joyKnob = document.getElementById('mobile-joystick-knob');
+        const JOY_MAX_RADIUS = 44;
+
+        function updateJoystickFromPoint(clientX, clientY) {
+            const rect = joyZone.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            let dx = clientX - centerX;
+            let dy = clientY - centerY;
+            const dist = Math.hypot(dx, dy);
+            if (dist > JOY_MAX_RADIUS) {
+                dx = (dx / dist) * JOY_MAX_RADIUS;
+                dy = (dy / dist) * JOY_MAX_RADIUS;
+            }
+            joyKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+            mobileTouchState.moveX = dx / JOY_MAX_RADIUS;
+            mobileTouchState.moveZ = dy / JOY_MAX_RADIUS;
+        }
+
+        function resetJoystick() {
+            mobileTouchState.joyActive = false;
+            mobileTouchState.joyTouchId = null;
+            mobileTouchState.moveX = 0;
+            mobileTouchState.moveZ = 0;
+            if (joyKnob) joyKnob.style.transform = 'translate(0px, 0px)';
+        }
+
+        if (joyZone) {
+            joyZone.addEventListener('touchstart', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                const t = e.changedTouches[0];
+                mobileTouchState.joyActive = true;
+                mobileTouchState.joyTouchId = t.identifier;
+                updateJoystickFromPoint(t.clientX, t.clientY);
+            }, { passive: false });
+
+            joyZone.addEventListener('touchmove', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    const t = e.changedTouches[i];
+                    if (t.identifier === mobileTouchState.joyTouchId) {
+                        updateJoystickFromPoint(t.clientX, t.clientY);
+                    }
+                }
+            }, { passive: false });
+
+            const handleJoyEnd = e => {
+                e.preventDefault();
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === mobileTouchState.joyTouchId) {
+                        resetJoystick();
+                    }
+                }
+            };
+            joyZone.addEventListener('touchend', handleJoyEnd, { passive: false });
+            joyZone.addEventListener('touchcancel', handleJoyEnd, { passive: false });
+
+            // Also allow mouse drag on Joystick for easy testing on PC
+            joyZone.addEventListener('mousedown', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                mobileTouchState.joyActive = true;
+                updateJoystickFromPoint(e.clientX, e.clientY);
+            });
+            window.addEventListener('mousemove', e => {
+                if (mobileTouchState.joyActive && mobileTouchState.joyTouchId === null) {
+                    updateJoystickFromPoint(e.clientX, e.clientY);
+                }
+            });
+            window.addEventListener('mouseup', () => {
+                if (mobileTouchState.joyActive && mobileTouchState.joyTouchId === null) {
+                    resetJoystick();
+                }
+            });
+        }
+
+        // Right Mobile Buttons: Attack & Heal
+        const mobAtkBtn = document.getElementById('mobile-btn-attack');
+        const mobHealBtn = document.getElementById('mobile-btn-heal');
+
+        function bindMobileActionBtn(btn, stateProp) {
+            if (!btn) return;
+            const press = e => {
+                e.preventDefault();
+                e.stopPropagation();
+                mobileTouchState[stateProp] = true;
+                btn.classList.add('active-touch');
+            };
+            const release = e => {
+                e.preventDefault();
+                e.stopPropagation();
+                mobileTouchState[stateProp] = false;
+                btn.classList.remove('active-touch');
+            };
+            btn.addEventListener('touchstart', press, { passive: false });
+            btn.addEventListener('touchend', release, { passive: false });
+            btn.addEventListener('touchcancel', release, { passive: false });
+            btn.addEventListener('mousedown', press);
+            btn.addEventListener('mouseup', release);
+            btn.addEventListener('mouseleave', release);
+        }
+
+        bindMobileActionBtn(mobAtkBtn, 'attackPressed');
+        bindMobileActionBtn(mobHealBtn, 'healPressed');
 
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
@@ -2195,9 +2672,29 @@
         document.getElementById('btn-drop-now').addEventListener('click', () => spawnAirdropCrate());
         document.getElementById('btn-reset-cam').addEventListener('click', () => { camAngle = 0; camZoomOffset = 0; });
 
+        document.getElementById('btn-choose-pc').addEventListener('click', () => setDeviceMode('PC', true));
+        document.getElementById('btn-choose-mobile').addEventListener('click', () => setDeviceMode('MOBILE', true));
+        document.getElementById('btn-lobby-switch-pc').addEventListener('click', () => setDeviceMode('PC', false));
+        document.getElementById('btn-lobby-switch-mobile').addEventListener('click', () => setDeviceMode('MOBILE', false));
+        document.getElementById('btn-toggle-device-hud').addEventListener('click', () => {
+            setDeviceMode(gameState.deviceType === 'PC' ? 'MOBILE' : 'PC', false);
+        });
+        document.getElementById('btn-toggle-bot-hud').addEventListener('click', () => {
+            gameState.p2BotEnabled = !gameState.p2BotEnabled;
+            updateBotToggleUI();
+        });
+
         window.addEventListener('DOMContentLoaded', () => {
             buildArenaMap('cyber');
             renderMenuSelections();
+
+            // Pre-highlight Mobile card if touch screen detected, while still letting user choose
+            if ('ontouchstart' in window || navigator.maxTouchPoints > 0 || window.innerWidth < 820) {
+                setDeviceMode('MOBILE', false);
+            } else {
+                setDeviceMode('PC', false);
+            }
+
             animate(performance.now());
 
             // Auto-join if opened with ?room=12345 link
